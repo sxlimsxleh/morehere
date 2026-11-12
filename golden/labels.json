@@ -11,6 +11,7 @@
     "group_size": "small: under 10 people (an explicit 'max 10' counts as small), medium: 10-30, large: over 30. Seats in a room are not a group size.",
     "times": "Local wall-clock HH:MM.",
     "expected_rrule": "The schedule code should derive (milestone 4). null when no reliable schedule can be derived.",
+    "observations": "Spans a correct extraction quotes for model-reported flags (cancelled, uncertain_source). Other flags are derived by code: not_recurring/ambiguous_recurrence from the recurrence phrase, missing_time from the start time, stale from source_updated_at, suspected_injection from injection_text or a pattern check.",
     "expected_outcome": "publishable: no blocking flag and schedule + place are grounded. needs_review: a flag a curator must resolve. reject: out of scope (one-off or cancelled)."
   },
   "files": [
@@ -523,6 +524,7 @@
           "merge_group": null,
           "flags": ["cancelled"],
           "expected_rrule": "FREQ=WEEKLY;BYDAY=TH",
+          "observations": {"cancelled": "is cancelled until further notice"},
           "fields": {
             "title": {"value": "Thursday Knit Club", "source_text": "the Thursday Knit Club at Café Masche"},
             "place_name": {"value": "Café Masche", "source_text": "the Thursday Knit Club at Café Masche (Pariser Straße 9, Haidhausen)"},
@@ -636,6 +638,7 @@
           "merge_group": null,
           "flags": ["missing_time", "uncertain_source"],
           "expected_rrule": "FREQ=WEEKLY;BYDAY=TH",
+          "observations": {"uncertain_source": "free i think?"},
           "fields": {
             "title": {"value": "Film club", "source_text": "there's a film club screening a movie"},
             "place_name": {"value": "Kino im Hinterhof", "source_text": "at Kino im Hinterhof in Au"},

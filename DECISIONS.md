@@ -107,3 +107,27 @@ One entry per decision: what we chose, what we rejected and why, and where the A
 - **Chose:** strip explicit edition markers only (Vol./#/No./Nr./Night/Teil/Edition/Ausgabe + number) and compare letters and digits, so emoji and punctuation don't split a series either. Weekday, local start time and place must still match, so the rule is no looser.
 - **Rejected:** stripping all numbers. "5k Run Club" and "Repair Café 246" would lose meaning, and unrelated events would merge.
 - **Added:** `series_hints` in the probe output: numbered one-offs with their event link, so a discover feed points to the host calendars worth probing.
+
+## M5 · Structured outputs instead of a `record_listing` tool
+
+- **Chose:** `output_config.format` with a JSON schema; the model gets no tools at all. It guarantees the reply shape, allows several listings per document (a newsletter), and is stricter than "one tool that can't act".
+- **Why the change:** the default model (`claude-opus-5-5`) rejects forced tool use (`tool_choice` any/tool), so "exactly one tool, always called" can't be enforced; `auto` doesn't guarantee a call.
+- **Rejected:** a tool with `tool_choice: auto` plus retries when it isn't called. More code and a failure mode that structured outputs simply don't have.
+
+## M5 · The model makes claims; code decides
+
+- Every field comes back as `{value, source_text, note}`. `ground.py` accepts a value only if the quote occurs in the document text and supports the value: times, prices and dates are parsed out of the quote; names and phrases must appear in it; district names map to a Stadtbezirk via config (ambiguous -> flagged). Judgement fields (category, language, come alone, ...) need a real quote but can't be string-matched; the eval's "wrong accepted" column watches them.
+- Flags are code's decision from grounded evidence: recurrence via `recurrence.py`, `missing_time`, `stale` from the page's own date, `suspected_injection` from the model's report **or** a pattern check. A test feeds an "obedient" model reply (it ignores the injection) and the listing is still never publishable.
+- A fake "perfect model" built from the labels scores 100% on every metric; that proves grounding doesn't reject correct answers. Mutation checks: disabling the quote check or the injection pattern check makes tests fail.
+
+## M5 · Determinism without temperature (rule 10 rewritten)
+
+- Current models reject `temperature`. Runs are made comparable with a pinned model and effort, and CI replays recorded responses keyed on model + effort + prompt version + document. Run-to-run variation is measured by running the live eval twice.
+
+## M5 · Live evals run in the Codespace
+
+- The API key stays in the Codespace's `.env`, not in the cloud dev session (whose Anthropic traffic bypasses its credential proxy, so a key would have to sit in a file there). Recordings and results are committed from the Codespace.
+
+## M5 · Refusal fallback on by default
+
+- `fallbacks: "default"` (beta `server-side-fallback-2026-07-01`): if a safety classifier declines, the API retries on Anthropic's recommended model in the same call. Unlikely for this content, but a refused record would otherwise fail. A refusal of the whole chain is an `ExtractionError` and the record is retried later.

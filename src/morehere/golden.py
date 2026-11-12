@@ -51,6 +51,8 @@ class GoldenListing(_Strict):
     expected_breaks: list[ScheduleBreak] = Field(default_factory=list)
     expected_exdates: list[str] = Field(default_factory=list)
     injection_text: str | None = None
+    # Spans a correct extraction quotes for model-reported flags, e.g. {"cancelled": "..."}.
+    observations: dict[str, str] = Field(default_factory=dict)
     fields: dict[str, GoldenField]
 
     @model_validator(mode="after")

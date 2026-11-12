@@ -414,6 +414,21 @@ def get_listing(session: Session, listing_id: str) -> Listing | None:
 # ---------------------------------------------------------------------------
 
 
+def raw_records_without_drafts(
+    session: Session, exclude_source_ids: list[str] | None = None
+) -> list[RawRecord]:
+    """Raw records extraction hasn't seen yet, oldest first."""
+    has_draft = select(ListingDraftRow.raw_record_id).distinct()
+    stmt = (
+        select(RawRecordRow)
+        .where(RawRecordRow.raw_record_id.not_in(has_draft))
+        .order_by(RawRecordRow.fetched_at, RawRecordRow.raw_record_id)
+    )
+    if exclude_source_ids:
+        stmt = stmt.where(RawRecordRow.source_id.not_in(exclude_source_ids))
+    return [_raw_record_from_row(row) for row in session.scalars(stmt)]
+
+
 def save_draft(session: Session, draft: ListingDraft) -> int:
     """Queue an extraction result for curator review. Returns the draft_id."""
     return session.execute(
