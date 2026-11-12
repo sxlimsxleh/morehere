@@ -13,11 +13,12 @@ from datetime import UTC, datetime
 from typing import Any
 
 from geoalchemy2 import Geometry
-from sqlalchemy import cast, delete, func, select
-from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy import cast, delete, func, select, update
+from sqlalchemy.dialects.postgresql import array, insert
 from sqlalchemy.orm import Session
 
 from morehere.db.tables import (
+    DistrictRow,
     EvidenceRow,
     ListingDraftRow,
     ListingFieldEvidenceRow,
@@ -95,6 +96,19 @@ def save_raw_record(session: Session, record: RawRecord) -> tuple[RawRecord, boo
     return _raw_record_from_row(row), created
 
 
+def latest_raw_record(session: Session, source_id: str, id_prefix: str = "") -> RawRecord | None:
+    row = session.scalars(
+        select(RawRecordRow)
+        .where(
+            RawRecordRow.source_id == source_id,
+            RawRecordRow.raw_record_id.startswith(id_prefix),
+        )
+        .order_by(RawRecordRow.fetched_at.desc())
+        .limit(1)
+    ).first()
+    return _raw_record_from_row(row) if row else None
+
+
 def _raw_record_from_row(row: RawRecordRow) -> RawRecord:
     return RawRecord.model_validate({name: getattr(row, name) for name in RawRecord.model_fields})
 
@@ -109,9 +123,12 @@ def _point_ewkt(geo: GeoPoint) -> str:
     return f"SRID=4326;POINT({geo.lon} {geo.lat})"
 
 
-def save_place(session: Session, place: Place) -> None:
+def save_place(session: Session, place: Place, seen_at: datetime | None = None) -> None:
+    """Insert or update a place. `seen_at` records when an ingestion run saw it."""
     values: dict[str, Any] = place.model_dump(exclude={"geo"})
     values["geo"] = _point_ewkt(place.geo) if place.geo else None
+    if seen_at is not None:
+        values["last_seen_at"] = _utc(seen_at)
     stmt = insert(PlaceRow).values(**values)
     stmt = stmt.on_conflict_do_update(
         index_elements=[PlaceRow.place_id],
@@ -168,6 +185,80 @@ def places_near(
     if kind is not None:
         stmt = stmt.where(PlaceRow.kind == kind)
     return [(_place_from_mapping(m), float(m.distance_m)) for m in session.execute(stmt)]
+
+
+def count_places_not_seen_since(session: Session, seen_at: datetime) -> int:
+    """OSM places the latest run did not see (closed, renamed, or retagged in OSM)."""
+    return (
+        session.scalar(
+            select(func.count())
+            .select_from(PlaceRow)
+            .where(
+                PlaceRow.osm_id.is_not(None),
+                (PlaceRow.last_seen_at.is_(None)) | (PlaceRow.last_seen_at < _utc(seen_at)),
+            )
+        )
+        or 0
+    )
+
+
+# ---------------------------------------------------------------------------
+# Districts
+# ---------------------------------------------------------------------------
+
+
+def save_district(
+    session: Session, number: int, name: str, osm_id: str, ways_wkt: list[str]
+) -> None:
+    """Store a district boundary, letting PostGIS assemble the polygon from its ways.
+
+    ST_BuildArea turns a set of lines (outer and inner rings, in any order and split
+    into any number of ways) into polygons with holes. If they don't close into an
+    area, it returns NULL and we fail loudly instead of storing a broken boundary.
+    """
+    if not ways_wkt:
+        raise ValueError(f"district {name}: no member ways")
+    lines = [func.ST_GeomFromText(w, 4326) for w in ways_wkt]
+    area = func.ST_Multi(func.ST_BuildArea(func.ST_Collect(array(lines))))
+    geom = session.scalar(select(area))
+    if geom is None:
+        raise ValueError(f"district {name}: member ways do not close into an area")
+    stmt = insert(DistrictRow).values(number=number, name=name, osm_id=osm_id, geom=geom)
+    stmt = stmt.on_conflict_do_update(
+        index_elements=[DistrictRow.number],
+        set_={"name": name, "osm_id": osm_id, "geom": geom, "updated_at": func.now()},
+    )
+    session.execute(stmt)
+
+
+def district_at(session: Session, point: GeoPoint) -> str | None:
+    here = func.ST_GeomFromText(f"POINT({point.lon} {point.lat})", 4326)
+    return session.scalar(
+        select(DistrictRow.name).where(func.ST_Covers(DistrictRow.geom, here)).limit(1)
+    )
+
+
+def assign_districts(session: Session) -> int:
+    """Set every located place's district from the boundaries. Returns how many got one.
+
+    Location wins over any district name found in text. Does nothing if no boundaries
+    are loaded yet, so a places run before a districts run does no harm.
+    """
+    if not session.scalar(select(func.count()).select_from(DistrictRow)):
+        return 0
+    containing = (
+        select(DistrictRow.name)
+        .where(func.ST_Covers(DistrictRow.geom, cast(PlaceRow.geo, Geometry)))
+        .limit(1)
+        .scalar_subquery()
+    )
+    session.execute(update(PlaceRow).where(PlaceRow.geo.is_not(None)).values(district=containing))
+    return (
+        session.scalar(
+            select(func.count()).select_from(PlaceRow).where(PlaceRow.district.is_not(None))
+        )
+        or 0
+    )
 
 
 # ---------------------------------------------------------------------------

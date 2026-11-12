@@ -1,0 +1,154 @@
+{
+ "version": 0.6,
+ "generator": "hand-built test fixture (not real OSM data)",
+ "elements": [
+  {
+   "type": "relation",
+   "id": 9001,
+   "tags": {
+    "boundary": "administrative",
+    "admin_level": "9",
+    "name": "Altstadt-Lehel"
+   },
+   "members": [
+    {
+     "type": "way",
+     "ref": 1,
+     "role": "outer",
+     "geometry": [
+      {
+       "lat": 48.132,
+       "lon": 11.57
+      },
+      {
+       "lat": 48.132,
+       "lon": 11.585
+      },
+      {
+       "lat": 48.142,
+       "lon": 11.585
+      }
+     ]
+    },
+    {
+     "type": "way",
+     "ref": 2,
+     "role": "outer",
+     "geometry": [
+      {
+       "lat": 48.142,
+       "lon": 11.585
+      },
+      {
+       "lat": 48.142,
+       "lon": 11.57
+      },
+      {
+       "lat": 48.132,
+       "lon": 11.57
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "relation",
+   "id": 9003,
+   "tags": {
+    "boundary": "administrative",
+    "admin_level": "9",
+    "name": "Stadtbezirk 03 Maxvorstadt"
+   },
+   "members": [
+    {
+     "type": "way",
+     "ref": 3,
+     "role": "outer",
+     "geometry": [
+      {
+       "lat": 48.143,
+       "lon": 11.555
+      },
+      {
+       "lat": 48.143,
+       "lon": 11.575
+      },
+      {
+       "lat": 48.155,
+       "lon": 11.575
+      },
+      {
+       "lat": 48.155,
+       "lon": 11.555
+      },
+      {
+       "lat": 48.143,
+       "lon": 11.555
+      }
+     ]
+    },
+    {
+     "type": "way",
+     "ref": 4,
+     "role": "inner",
+     "geometry": [
+      {
+       "lat": 48.148,
+       "lon": 11.562
+      },
+      {
+       "lat": 48.148,
+       "lon": 11.566
+      },
+      {
+       "lat": 48.151,
+       "lon": 11.566
+      },
+      {
+       "lat": 48.151,
+       "lon": 11.562
+      },
+      {
+       "lat": 48.148,
+       "lon": 11.562
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "relation",
+   "id": 9099,
+   "tags": {
+    "boundary": "administrative",
+    "admin_level": "9",
+    "name": "Irgendwo"
+   },
+   "members": [
+    {
+     "type": "way",
+     "ref": 5,
+     "role": "outer",
+     "geometry": [
+      {
+       "lat": 48.2,
+       "lon": 11.7
+      },
+      {
+       "lat": 48.2,
+       "lon": 11.71
+      },
+      {
+       "lat": 48.21,
+       "lon": 11.71
+      },
+      {
+       "lat": 48.2,
+       "lon": 11.7
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

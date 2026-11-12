@@ -1,4 +1,4 @@
-.PHONY: setup test test-db lint format db db-down db-reset migrate seed
+.PHONY: setup test test-db lint format db db-down db-reset migrate seed osm osm-districts osm-replay
 
 setup:
 	uv sync
@@ -36,3 +36,14 @@ migrate:
 
 seed:
 	uv run python -m morehere.db.seed
+
+# OpenStreetMap base layer (needs network access to overpass-api.de)
+osm-districts:
+	uv run python -m morehere.sources.osm districts
+
+osm:
+	uv run python -m morehere.sources.osm places
+
+# Re-parse the latest stored OSM payload; no network.
+osm-replay:
+	uv run python -m morehere.sources.osm replay
