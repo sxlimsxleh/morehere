@@ -45,6 +45,10 @@ No agent frameworks. The model name comes from env `ANTHROPIC_MODEL` and the key
 
 ```
 config/munich.yaml           # bbox, districts, freshness window, score weights, OSM tag list
+config/sources.yaml          # the source registry (legal status, licence, refresh, reliability)
+docker/postgres/             # Postgres 16 + PostGIS + pgvector image; creates morehere_test
+docker-compose.yml           # local db service
+alembic.ini
 data/raw/                    # sample raw inputs: iCal, venue pages, newsletters, pasted posts, form JSON
 golden/labels.json           # hand-labelled listings + expected flags for evals
 src/morehere/
@@ -52,7 +56,12 @@ src/morehere/
   config.py                  # load + validate config/<city>.yaml
   golden.py                  # load + validate golden/labels.json
   text.py                    # whitespace normalisation, verbatim-span check
-  db/                        # SQLAlchemy tables + Alembic migrations
+  db/
+    tables.py                # SQLAlchemy tables (storage shapes only)
+    repo.py                  # the only Pydantic <-> row conversion; the app sees Pydantic only
+    session.py               # engine + session_scope; DATABASE_URL
+    seed.py                  # load config/sources.yaml into the registry
+    migrations/              # Alembic; migrations written by hand, drift checked by a test
   sources/                   # one module per source: osm.py, ical.py, submission.py, email_inbox.py
   ingest.py                  # fetch -> store RawRecord (hash, dedupe), per-source registry entry
   extract.py                 # Claude tool-use extraction -> ListingDraft
@@ -111,9 +120,11 @@ The dates in the plan are a guide, not a deadline. Finish a milestone properly b
 
 ```
 make setup     # uv sync
-make db        # docker compose up postgres
+make db        # docker compose up postgres (+ db-down, db-reset)
 make migrate   # alembic upgrade head
-make test      # pytest
+make seed      # load the source registry
+make test      # pytest; db tests skip if Postgres is down
+make test-db   # db tests only; fail if Postgres is down (CI)
 make lint      # ruff check + format check
 make evals     # live evals (needs key); make evals-recorded for CI
 make admin     # streamlit curator admin

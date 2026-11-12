@@ -1,0 +1,74 @@
+# The source registry (rule 5: legal sources only).
+# Every source we ingest from has an entry here; `make seed` loads it into the database.
+#
+# reliability (0-1) is our prior for how often a source is right; it feeds merging and
+# freshness later. refresh_cron is null for sources that push data to us.
+#
+# Per-feed entries (one per iCal calendar, per organiser) are added by their milestones;
+# these are the source families for version 1.
+
+sources:
+  - source_id: osm-overpass
+    kind: osm
+    name: OpenStreetMap (Overpass API)
+    legal_status: open_licence
+    licence: ODbL-1.0
+    attribution: © OpenStreetMap contributors
+    refresh_cron: "0 3 * * 1"  # Mondays 03:00
+    reliability: 0.8
+
+  - source_id: ical-public-feeds
+    kind: ical
+    name: Public iCal feeds (Luma, venues, clubs)
+    legal_status: public_feed
+    licence: null
+    attribution: null
+    refresh_cron: "0 */6 * * *"  # every 6 hours
+    reliability: 0.85
+
+  - source_id: organiser-form
+    kind: submission
+    name: Organiser and venue submissions
+    legal_status: first_party
+    licence: null
+    attribution: null
+    refresh_cron: null
+    reliability: 0.9
+
+  - source_id: email-inbox
+    kind: email
+    name: Forwarded newsletters and emails
+    legal_status: user_provided
+    licence: null
+    attribution: null
+    refresh_cron: null
+    reliability: 0.6
+
+  - source_id: pasted-links
+    kind: web_page
+    name: Pages behind links that users paste
+    legal_status: user_provided
+    licence: null
+    attribution: null
+    refresh_cron: null
+    reliability: 0.6
+
+  - source_id: community-tips
+    kind: tip
+    name: Community tips typed in the app
+    legal_status: user_provided
+    licence: null
+    attribution: null
+    refresh_cron: null
+    reliability: 0.5
+
+  # Live enrichment only: Google's terms limit storing its content, so nothing from
+  # this source is cached beyond what the terms allow (check before milestone 6).
+  - source_id: google-places
+    kind: places_api
+    name: Google Places API
+    legal_status: licensed_api
+    licence: Google Maps Platform Terms of Service
+    attribution: Google Maps
+    refresh_cron: null
+    reliability: 0.8

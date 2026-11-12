@@ -7,12 +7,13 @@ validated here so a typo in a label fails loudly instead of skewing accuracy num
 from __future__ import annotations
 
 import json
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from morehere.models import DRAFT_FIELDS, Flag, ScheduleBreak, SourceKind
+from morehere.models import DRAFT_FIELDS, Evidence, Flag, ListingDraft, ScheduleBreak, SourceKind
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_LABELS_PATH = REPO_ROOT / "golden" / "labels.json"
@@ -80,3 +81,38 @@ class GoldenSet(_Strict):
 
 def load_golden(path: Path = DEFAULT_LABELS_PATH) -> GoldenSet:
     return GoldenSet.model_validate(json.loads(path.read_text(encoding="utf-8")))
+
+
+def golden_draft(
+    golden: GoldenSet, golden_file: GoldenFile, listing: GoldenListing
+) -> ListingDraft:
+    """The ListingDraft a perfect extractor would return for this label.
+
+    Used by tests (to check labels fit the contracts) and by evals (as the expected value).
+    """
+    captured_at = datetime.fromisoformat(golden.as_of)
+    source_id = f"golden-{golden_file.source_kind}"
+    data: dict[str, object] = {
+        "raw_record_id": golden_file.file,
+        "source_id": source_id,
+        "extracted_at": captured_at,
+        "flags": listing.flags,
+    }
+    for name in DRAFT_FIELDS:
+        label = listing.fields.get(name)
+        if label is None:
+            data[name] = {"status": "flagged", "reason": "not stated"}
+            continue
+        evidence = None
+        if label.source_text:
+            evidence = Evidence(
+                source_id=source_id,
+                raw_record_id=golden_file.file,
+                source_text=label.source_text,
+                captured_at=captured_at,
+            )
+        if label.flagged is not None:
+            data[name] = {"status": "flagged", "reason": label.flagged, "evidence": evidence}
+        else:
+            data[name] = {"status": "ok", "value": label.value, "evidence": evidence}
+    return ListingDraft.model_validate(data)
