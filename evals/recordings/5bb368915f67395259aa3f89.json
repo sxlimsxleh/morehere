@@ -1,0 +1,14 @@
+{
+  "model": "claude-opus-5-5",
+  "effort": "medium",
+  "prompt_version": "2026-11-13.3",
+  "served_by": "claude-opus-5-5",
+  "stop_reason": "end_turn",
+  "usage": {
+    "input_tokens": 444,
+    "output_tokens": 1372,
+    "cache_read_input_tokens": 0,
+    "cache_creation_input_tokens": 2160
+  },
+  "text": "{\"listings\":[{\"facts\":[{\"field\":\"title\",\"value\":\"Tandem Tuesday – English/German Language Café\",\"source_text\":\"SUMMARY:Tandem Tuesday – English/German Language Café\",\"note\":\"\"},{\"field\":\"place_name\",\"value\":\"Café Lindwurm\",\"source_text\":\"LOCATION:Café Lindwurm, Hohenzollernstraße 41, 80801 München\",\"note\":\"\"},{\"field\":\"address\",\"value\":\"Hohenzollernstraße 41\",\"source_text\":\"LOCATION:Café Lindwurm, Hohenzollernstraße 41, 80801 München\",\"note\":\"\"},{\"field\":\"district\",\"value\":\"Schwabing\",\"source_text\":\"Practise German or English over coffee in Schwabing.\",\"note\":\"\"},{\"field\":\"category\",\"value\":\"language_exchange\",\"source_text\":\"SUMMARY:Tandem Tuesday – English/German Language Café\",\"note\":\"\"},{\"field\":\"recurrence_text\",\"value\":\"FREQ=WEEKLY;BYDAY=TU\",\"source_text\":\"RRULE:FREQ=WEEKLY;BYDAY=TU\",\"note\":\"\"},{\"field\":\"start_time\",\"value\":\"19:00\",\"source_text\":\"DTSTART;TZID=Europe/Berlin:20260908T190000\",\"note\":\"\"},{\"field\":\"end_time\",\"value\":\"21:00\",\"source_text\":\"DTEND;TZID=Europe/Berlin:20260908T210000\",\"note\":\"\"},{\"field\":\"language\",\"value\":\"en+de\",\"source_text\":\"Practise German or English over coffee in Schwabing.\",\"note\":\"\"},{\"field\":\"price_eur\",\"value\":\"0\",\"source_text\":\"Entry is free, just order a drink at the bar.\",\"note\":\"\"},{\"field\":\"come_alone\",\"value\":\"true\",\"source_text\":\"Most people come alone, so don't be shy!\",\"note\":\"\"},{\"field\":\"beginner_friendly\",\"value\":\"true\",\"source_text\":\"All levels welcome, from A1 to native.\",\"note\":\"\"},{\"field\":\"group_size\",\"value\":\"medium\",\"source_text\":\"Usually 15-25 people.\",\"note\":\"\"},{\"field\":\"first_timer_info\",\"value\":\"Look for the table with the little flags.\",\"source_text\":\"First time? Look for the table with the little flags.\",\"note\":\"\"},{\"field\":\"organiser_contact\",\"value\":\"https://lu.ma.example/tandem-tuesday\",\"source_text\":\"URL:https://lu.ma.example/tandem-tuesday\",\"note\":\"\"}],\"observations\":[]}],\"injection_spans\":[]}"
+}

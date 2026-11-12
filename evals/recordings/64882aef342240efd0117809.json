@@ -1,0 +1,14 @@
+{
+  "model": "claude-opus-5-5",
+  "effort": "medium",
+  "prompt_version": "2026-11-13.3",
+  "served_by": "claude-opus-5-5",
+  "stop_reason": "end_turn",
+  "usage": {
+    "input_tokens": 297,
+    "output_tokens": 883,
+    "cache_read_input_tokens": 2160,
+    "cache_creation_input_tokens": 0
+  },
+  "text": "{\"listings\":[{\"facts\":[{\"field\":\"title\",\"value\":\"International Stammtisch Maxvorstadt\",\"source_text\":\"International Stammtisch Maxvorstadt\",\"note\":\"\"},{\"field\":\"place_name\",\"value\":\"Wirtshaus Zum Kramer\",\"source_text\":\"Wirtshaus Zum Kramer\",\"note\":\"\"},{\"field\":\"address\",\"value\":\"Augustenstraße 70\",\"source_text\":\"Augustenstraße 70, 80333 München\",\"note\":\"\"},{\"field\":\"district\",\"value\":\"Maxvorstadt\",\"source_text\":\"International Stammtisch Maxvorstadt\",\"note\":\"District named in the event title.\"},{\"field\":\"category\",\"value\":\"social\",\"source_text\":\"International Stammtisch Maxvorstadt\",\"note\":\"\"},{\"field\":\"recurrence_text\",\"value\":\"every Thursday\",\"source_text\":\"every Thursday\",\"note\":\"\"},{\"field\":\"start_time\",\"value\":\"20:00\",\"source_text\":\"\\\"start_time\\\": \\\"20:00\\\"\",\"note\":\"\"},{\"field\":\"language\",\"value\":\"en+de\",\"source_text\":\"English and German\",\"note\":\"\"},{\"field\":\"price_eur\",\"value\":\"0\",\"source_text\":\"free, pay your own drinks\",\"note\":\"\"},{\"field\":\"come_alone\",\"value\":\"true\",\"source_text\":\"yes, about half of the people come alone\",\"note\":\"\"},{\"field\":\"first_timer_info\",\"value\":\"Look for the small flag on the long table at the back.\",\"source_text\":\"Look for the small flag on the long table at the back.\",\"note\":\"\"},{\"field\":\"organiser_contact\",\"value\":\"hello@stammtisch-maxvorstadt.example\",\"source_text\":\"hello@stammtisch-maxvorstadt.example\",\"note\":\"\"}],\"observations\":[]}],\"injection_spans\":[]}"
+}

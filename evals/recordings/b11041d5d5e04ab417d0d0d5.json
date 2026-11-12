@@ -1,0 +1,14 @@
+{
+  "model": "claude-opus-5-5",
+  "effort": "medium",
+  "prompt_version": "2026-11-13.3",
+  "served_by": "claude-opus-5-5",
+  "stop_reason": "end_turn",
+  "usage": {
+    "input_tokens": 124,
+    "output_tokens": 570,
+    "cache_read_input_tokens": 2160,
+    "cache_creation_input_tokens": 0
+  },
+  "text": "{\"listings\":[{\"facts\":[{\"field\":\"title\",\"value\":\"Chess in the Park\",\"source_text\":\"Chess in the Park\",\"note\":\"\"},{\"field\":\"place_name\",\"value\":\"Alter Botanischer Garten\",\"source_text\":\"in the Alter Botanischer Garten, near the fountain\",\"note\":\"\"},{\"field\":\"category\",\"value\":\"board_games\",\"source_text\":\"Chess in the Park\",\"note\":\"\"},{\"field\":\"recurrence_text\",\"value\":\"\",\"source_text\":\"We play biweekly on Saturdays\",\"note\":\"\\\"biweekly\\\" is ambiguous (every two weeks or twice a week).\"},{\"field\":\"start_time\",\"value\":\"14:00\",\"source_text\":\"on Saturdays at 14:00\",\"note\":\"\"},{\"field\":\"beginner_friendly\",\"value\":\"true\",\"source_text\":\"All levels, we're happy to teach.\",\"note\":\"\"},{\"field\":\"price_eur\",\"value\":\"0\",\"source_text\":\"Free.\",\"note\":\"\"},{\"field\":\"first_timer_info\",\"value\":\"Boards provided. Meet near the fountain; if it rains the group moves to the café next door.\",\"source_text\":\"Boards provided.\",\"note\":\"\"}],\"observations\":[]}],\"injection_spans\":[]}"
+}

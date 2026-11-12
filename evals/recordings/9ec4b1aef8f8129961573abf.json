@@ -1,0 +1,14 @@
+{
+  "model": "claude-opus-5-5",
+  "effort": "medium",
+  "prompt_version": "2026-11-13.3",
+  "served_by": "claude-opus-5-5",
+  "stop_reason": "end_turn",
+  "usage": {
+    "input_tokens": 149,
+    "output_tokens": 683,
+    "cache_read_input_tokens": 2160,
+    "cache_creation_input_tokens": 0
+  },
+  "text": "{\"listings\":[{\"facts\":[{\"field\":\"title\",\"value\":\"Munich Photo Walk Club\",\"source_text\":\"Munich Photo Walk Club\",\"note\":\"\"},{\"field\":\"recurrence_text\",\"value\":\"second Sunday of every month\",\"source_text\":\"on the second Sunday of every month at 10:00\",\"note\":\"\"},{\"field\":\"start_time\",\"value\":\"10:00\",\"source_text\":\"on the second Sunday of every month at 10:00\",\"note\":\"\"},{\"field\":\"place_name\",\"value\":\"Odeonsplatz, at the steps of the Feldherrnhalle\",\"source_text\":\"Meeting point: Odeonsplatz, at the steps of the Feldherrnhalle.\",\"note\":\"\"},{\"field\":\"category\",\"value\":\"arts_crafts\",\"source_text\":\"We walk and take photos together\",\"note\":\"\"},{\"field\":\"price_eur\",\"value\":\"0\",\"source_text\":\"Free.\",\"note\":\"\"},{\"field\":\"first_timer_info\",\"value\":\"Any camera works, phones too.\",\"source_text\":\"Any camera works, phones too.\",\"note\":\"\"},{\"field\":\"source_updated_at\",\"value\":\"2026-03-14\",\"source_text\":\"Last updated: 14 March 2026\",\"note\":\"\"}],\"observations\":[]}],\"injection_spans\":[]}"
+}

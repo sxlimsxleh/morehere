@@ -1,0 +1,14 @@
+{
+  "model": "claude-opus-5-5",
+  "effort": "medium",
+  "prompt_version": "2026-11-13.3",
+  "served_by": "claude-opus-5-5",
+  "stop_reason": "end_turn",
+  "usage": {
+    "input_tokens": 244,
+    "output_tokens": 1142,
+    "cache_read_input_tokens": 2160,
+    "cache_creation_input_tokens": 0
+  },
+  "text": "{\"listings\":[{\"facts\":[{\"field\":\"title\",\"value\":\"Offener Chor Haidhausen\",\"source_text\":\"Offener Chor Haidhausen\",\"note\":\"\"},{\"field\":\"place_name\",\"value\":\"Saal der Pfarrei St. Wolfgang\",\"source_text\":\"im Saal der Pfarrei St. Wolfgang (Kellerstraße 12)\",\"note\":\"\"},{\"field\":\"address\",\"value\":\"Kellerstraße 12\",\"source_text\":\"Kellerstraße 12\",\"note\":\"\"},{\"field\":\"district\",\"value\":\"Haidhausen\",\"source_text\":\"Offener Chor Haidhausen\",\"note\":\"\"},{\"field\":\"category\",\"value\":\"choir_music\",\"source_text\":\"Offener Chor Haidhausen\",\"note\":\"\"},{\"field\":\"recurrence_text\",\"value\":\"jeden Mittwoch\",\"source_text\":\"Wir proben jeden Mittwoch\",\"note\":\"\"},{\"field\":\"start_time\",\"value\":\"19:30\",\"source_text\":\"von 19:30 bis 21:00 Uhr\",\"note\":\"\"},{\"field\":\"end_time\",\"value\":\"21:00\",\"source_text\":\"von 19:30 bis 21:00 Uhr\",\"note\":\"\"},{\"field\":\"seasonal_text\",\"value\":\"Sommerpause im August.\",\"source_text\":\"Sommerpause im August.\",\"note\":\"\"},{\"field\":\"price_eur\",\"value\":\"15\",\"source_text\":\"Mitgliedsbeitrag: 15 € im Monat.\",\"note\":\"\"},{\"field\":\"price_period\",\"value\":\"monthly\",\"source_text\":\"Mitgliedsbeitrag: 15 € im Monat.\",\"note\":\"\"},{\"field\":\"beginner_friendly\",\"value\":\"true\",\"source_text\":\"Notenkenntnisse sind nicht nötig, wir lernen alles nach Gehör.\",\"note\":\"\"},{\"field\":\"first_timer_info\",\"value\":\"Die ersten zwei Proben sind kostenlos zum Reinschnuppern.\",\"source_text\":\"Die ersten zwei Proben sind kostenlos zum Reinschnuppern.\",\"note\":\"\"},{\"field\":\"organiser_contact\",\"value\":\"chor-haidhausen@verein.example\",\"source_text\":\"Kontakt: chor-haidhausen@verein.example\",\"note\":\"\"}],\"observations\":[]}],\"injection_spans\":[]}"
+}

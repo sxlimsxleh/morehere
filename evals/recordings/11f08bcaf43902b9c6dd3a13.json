@@ -1,0 +1,14 @@
+{
+  "model": "claude-opus-5-5",
+  "effort": "medium",
+  "prompt_version": "2026-11-13.3",
+  "served_by": "claude-opus-5-5",
+  "stop_reason": "end_turn",
+  "usage": {
+    "input_tokens": 304,
+    "output_tokens": 1268,
+    "cache_read_input_tokens": 2160,
+    "cache_creation_input_tokens": 0
+  },
+  "text": "{\"listings\":[{\"facts\":[{\"field\":\"title\",\"value\":\"Brettspielabend\",\"source_text\":\"Brettspielabend\",\"note\":\"\"},{\"field\":\"place_name\",\"value\":\"Treffpunkt Ligsalz\",\"source_text\":\"Treffpunkt Ligsalz\",\"note\":\"\"},{\"field\":\"address\",\"value\":\"Ligsalzstraße 30\",\"source_text\":\"Ligsalzstraße 30\",\"note\":\"\"},{\"field\":\"district\",\"value\":\"Westend\",\"source_text\":\"Nachbarschaftstreff im Westend\",\"note\":\"\"},{\"field\":\"category\",\"value\":\"board_games\",\"source_text\":\"Brettspielabend\",\"note\":\"\"},{\"field\":\"recurrence_text\",\"value\":\"Jeden 2. Donnerstag im Monat\",\"source_text\":\"Jeden 2. Donnerstag im Monat ab 19 Uhr wird bei uns gespielt.\",\"note\":\"\"},{\"field\":\"start_time\",\"value\":\"19:00\",\"source_text\":\"ab 19 Uhr\",\"note\":\"\"},{\"field\":\"language\",\"value\":\"\",\"source_text\":\"Gespielt wird meistens auf Deutsch, viele erklären aber gern auf Englisch.\",\"note\":\"Mostly played in German; many players are happy to explain in English, so it is unclear whether this counts as de or en+de.\"},{\"field\":\"price_eur\",\"value\":\"0\",\"source_text\":\"Eintritt frei, Spenden für neue Spiele sind willkommen.\",\"note\":\"\"},{\"field\":\"come_alone\",\"value\":\"true\",\"source_text\":\"auch wenn ihr allein kommt!\",\"note\":\"\"},{\"field\":\"first_timer_info\",\"value\":\"Wir haben über 80 Spiele im Regal, ihr könnt aber auch eigene mitbringen.\",\"source_text\":\"Wir haben über 80 Spiele im Regal, ihr könnt aber auch eigene mitbringen.\",\"note\":\"\"}],\"observations\":[]}],\"injection_spans\":[]}"
+}
