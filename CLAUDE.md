@@ -49,6 +49,9 @@ data/raw/                    # sample raw inputs: iCal, venue pages, newsletters
 golden/labels.json           # hand-labelled listings + expected flags for evals
 src/morehere/
   models.py                  # Pydantic data contracts (below)
+  config.py                  # load + validate config/<city>.yaml
+  golden.py                  # load + validate golden/labels.json
+  text.py                    # whitespace normalisation, verbatim-span check
   db/                        # SQLAlchemy tables + Alembic migrations
   sources/                   # one module per source: osm.py, ical.py, submission.py, email_inbox.py
   ingest.py                  # fetch -> store RawRecord (hash, dedupe), per-source registry entry
@@ -68,17 +71,22 @@ tests/
 DECISIONS.md                 # decision, rejected alternative, where the AI got it wrong
 ```
 
-## Data contracts (draft; ask before changing once agreed)
+## Data contracts (agreed in M1; ask before changing)
+
+The source of truth is `src/morehere/models.py`; this is the summary.
 
 - `Evidence`: `source_id`, `raw_record_id`, `source_text` (verbatim), `url | None`, `captured_at`
-- `ExtractedField[T]`: `value: T | None`, `evidence: Evidence | None`, `status: "ok" | "flagged"`, `reason: str | None`
-- `Source`: `source_id`, `kind` (`osm | ical | submission | email | tip | places_api`), `legal_status`, `licence`, `refresh_cron`, `reliability: float`
-- `RawRecord`: `raw_record_id`, `source_id`, `fetched_at`, `sha256`, `content_type`, `payload`
-- `Place`: `place_id`, `name`, `address`, `district`, `geo` (lat/lon), `osm_id | None`, `kind` (café, library, community centre, …), `tags`
-- `Schedule`: `rrule`, `dtstart`, `duration_min`, `exdates`, `timezone="Europe/Berlin"`, `breaks` (e.g. "summer break Aug")
-- `Listing` (a recurring thing at a place): `listing_id`, `title`, `place_id`, `category`, `schedule: ExtractedField[Schedule]`, `language`, `price_eur`, `come_alone`, `beginner_friendly`, `group_size`, `first_timer_info`, `organiser_contact`, `status` (`draft | needs_review | published | hidden`), `last_verified_at`, `source_ids`
+- `ExtractedField[T]`: `value: T | None`, `evidence: Evidence | None`, `status: "ok" | "flagged"`, `reason: str | None`. Validated: `ok` needs value + evidence; `flagged` needs a reason and no value.
+- `Source`: `source_id`, `kind` (`osm | ical | submission | email | tip | places_api | web_page`), `name`, `legal_status`, `licence`, `attribution`, `refresh_cron`, `reliability: float`
+- `RawRecord`: `raw_record_id`, `source_id`, `fetched_at`, `sha256` (validated against payload), `content_type`, `url`, `payload`
+- `Place`: `place_id`, `name`, `address`, `district`, `geo` (lat/lon), `osm_id | None`, `kind` (cafe, library, community_centre, …), `osm_tags` (raw OSM map data, not user-facing tags)
+- `Schedule`: `rrule` (no `RRULE:` prefix), `dtstart` (naive local time), `duration_min`, `exdates`, `timezone="Europe/Berlin"`, `breaks: list[ScheduleBreak(label, months)]`
+- `ListingDraft` (what extraction returns from one raw record): `raw_record_id`, `source_id`, `extracted_at`; every content field is an `ExtractedField`: `title`, `place_name`, `address`, `district`, `category`, `recurrence_text`, `start_time`, `end_time`, `seasonal_text`, `language`, `price_eur`, `price_period`, `come_alone`, `beginner_friendly`, `group_size`, `first_timer_info`, `organiser_contact`, `source_updated_at`; plus `tags` and `flags`. The LLM returns `recurrence_text`; code builds the RRULE.
+- `Listing` (a recurring thing at a place, after code and a curator decide): `listing_id`, `title`, `place_id`, `category`, `schedule: Schedule | None`, `language`, `price_eur`, `price_period`, `come_alone`, `beginner_friendly`, `group_size`, `first_timer_info`, `organiser_contact`, `tags`, `field_evidence: dict[field, Evidence]`, `status` (`draft | needs_review | published | hidden`), `last_verified_at`, `source_ids`. Validated: `published` needs an evidenced schedule, `last_verified_at` and a source.
 - `Tag`: `name`, `evidence: Evidence` (no evidence, no tag)
-- `RegularScore`: `total: float`, `components: dict[str, float]` (recurrence, newcomer-welcome, English, group size, price, distance), each traceable to tags or fields
+- `RegularScore`: `total: float`, `components: dict[str, float]` (recurrence, newcomer-welcome, English, group size, price, distance), `based_on: dict[component, list[field or tag]]`
+
+Flags a draft can carry: `suspected_injection`, `not_recurring`, `cancelled`, `stale`, `missing_time`, `ambiguous_recurrence`, `uncertain_source`. Any flag sends the draft to the curator queue.
 
 ## Milestones (commit after each; tests green before moving on)
 
@@ -106,6 +114,7 @@ make setup     # uv sync
 make db        # docker compose up postgres
 make migrate   # alembic upgrade head
 make test      # pytest
+make lint      # ruff check + format check
 make evals     # live evals (needs key); make evals-recorded for CI
 make admin     # streamlit curator admin
 make api       # uvicorn API

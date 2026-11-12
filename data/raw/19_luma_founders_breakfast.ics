@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Luma//Calendar//EN
+X-WR-CALNAME:Founders Breakfast Munich
+BEGIN:VEVENT
+UID:evt-9Zt4wQaB@lu.ma.example
+DTSTAMP:20261110T070000Z
+DTSTART;TZID=Europe/Berlin:20261009T080000
+DTEND;TZID=Europe/Berlin:20261009T093000
+RRULE:FREQ=WEEKLY;INTERVAL=2;BYDAY=FR
+SUMMARY:Founders Breakfast Munich
+LOCATION:Kaffeerösterei Nordlicht, Fraunhoferstraße 33, 80469 München
+DESCRIPTION:Breakfast for founders, freelancers and people thinking about it.
+ Small group (around 12 people), no pitches, just conversation.
+ Free, you pay your own coffee.
+ Conversation in English.
+URL:https://lu.ma.example/founders-breakfast-muc
+END:VEVENT
+END:VCALENDAR

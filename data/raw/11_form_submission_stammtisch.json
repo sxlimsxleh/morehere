@@ -1,0 +1,15 @@
+{
+  "form": "organiser_submission_v1",
+  "submitted_at": "2026-11-08T17:42:10+01:00",
+  "event_title": "International Stammtisch Maxvorstadt",
+  "recurrence": "every Thursday",
+  "start_time": "20:00",
+  "end_time": "",
+  "venue_name": "Wirtshaus Zum Kramer",
+  "address": "Augustenstraße 70, 80333 München",
+  "language": "English and German",
+  "price": "free, pay your own drinks",
+  "come_alone": "yes, about half of the people come alone",
+  "first_timer_tip": "Look for the small flag on the long table at the back.",
+  "contact_email": "hello@stammtisch-maxvorstadt.example"
+}
