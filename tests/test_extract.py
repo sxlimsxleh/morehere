@@ -431,3 +431,75 @@ def test_missing_key_stops_before_any_call(monkeypatch: pytest.MonkeyPatch) -> N
     monkeypatch.delenv("ANTHROPIC_AUTH_TOKEN", raising=False)
     with pytest.raises(MissingCredentials, match="unset ANTHROPIC_API_KEY"):
         AnthropicBackend()
+
+
+# --- The schema the API will accept ------------------------------------------------
+
+
+def _union_params(schema: Any) -> int:
+    """Parameters the API counts as unions: anyOf, or a list of types."""
+    if isinstance(schema, dict):
+        own = int("anyOf" in schema or isinstance(schema.get("type"), list))
+        return own + sum(_union_params(v) for v in schema.values())
+    if isinstance(schema, list):
+        return sum(_union_params(v) for v in schema)
+    return 0
+
+
+def test_schema_stays_within_the_api_union_limit() -> None:
+    # The first live run failed with 400: 54 union-typed parameters, limit 16.
+    assert _union_params(CLAIMS_SCHEMA) == 0
+
+
+def test_string_answers_are_converted_before_grounding() -> None:
+    # The schema has no nulls/numbers/booleans: "" = nothing, "8" = 8.0, "true" = True.
+    f = gfile("08_pottery")
+    claims = claims_with(
+        f,
+        price_eur=ClaimedField(value="8", source_text="8 € per evening, clay and firing included."),
+        beginner_friendly=ClaimedField(
+            value="true",
+            source_text="Beginners welcome: we start every evening",
+        ),
+        group_size=ClaimedField(value="", source_text="", note=""),
+    )
+    draft = extract(f, FakeBackend(claims)).drafts[0]
+    assert (draft.price_eur.status, draft.price_eur.value) == ("ok", 8.0)
+    assert (draft.beginner_friendly.status, draft.beginner_friendly.value) == ("ok", True)
+    assert (draft.group_size.status, draft.group_size.reason) == ("flagged", "not stated")
+
+
+def test_model_reply_in_schema_shape_is_accepted() -> None:
+    # Exactly what the API returns: every field present, empty strings for "nothing".
+    empty = {"value": "", "source_text": "", "note": ""}
+    fields = {name: dict(empty) for name in CLAIMS_SCHEMA["properties"]["listings"]["items"]
+              ["properties"]["fields"]["properties"]}  # fmt: skip
+    fields["title"] = {"value": "Isar Morning Runners", "source_text": "ISAR MORNING RUNNERS",
+                       "note": ""}  # fmt: skip
+    meet = "Every Saturday at 9:00 we meet"
+    fields["recurrence_text"] = {"value": "Every Saturday", "source_text": meet, "note": ""}
+    fields["start_time"] = {"value": "09:00", "source_text": meet, "note": ""}
+    reply = json.dumps({"listings": [{"fields": fields, "observations": []}],
+                        "injection_spans": []})  # fmt: skip
+    draft = extract(gfile("07_run_club"), FakeBackend(reply)).drafts[0]
+    assert draft.title.value == "Isar Morning Runners"
+    assert draft.start_time.value == time(9, 0)
+    assert draft.price_eur.reason == "not stated"
+
+
+def test_transient_api_errors_fail_one_record_not_the_run(monkeypatch: pytest.MonkeyPatch) -> None:
+    import anthropic
+    import httpx2
+
+    from morehere.extract import AnthropicBackend
+
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key-not-used")
+    backend = AnthropicBackend()
+
+    def overloaded(*args: Any, **kwargs: Any) -> Any:
+        request = httpx2.Request("POST", "https://api.anthropic.com/v1/messages")
+        raise anthropic.APIConnectionError(request=request)
+
+    monkeypatch.setattr(backend, "_create", overloaded)
+    with pytest.raises(ExtractionError, match="API unavailable"):
+        backend.complete(SETTINGS, "system", "user")

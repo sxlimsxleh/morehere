@@ -22,7 +22,7 @@ import re
 from datetime import date, datetime, time
 from typing import Any, Literal, get_args
 
-from pydantic import BaseModel, ConfigDict, ValidationError
+from pydantic import BaseModel, ConfigDict, ValidationError, field_validator
 
 from morehere.config import CityConfig
 from morehere.models import (
@@ -49,6 +49,12 @@ class ClaimedField(_Strict):
     value: Any = None
     source_text: str | None = None
     note: str | None = None
+
+    @field_validator("value", "source_text", "note", mode="before")
+    @classmethod
+    def _empty_is_none(cls, v: Any) -> Any:
+        # The schema has no nulls (API limit on union types): "" means "nothing".
+        return None if isinstance(v, str) and not v.strip() else v
 
 
 class Observation(_Strict):
@@ -207,6 +213,11 @@ def _support(name: str, value: Any, span: str, config: CityConfig) -> Any:
         if not any(_norm(n) in _norm(span) for n in [district.name, *district.aliases]):
             raise Unsupported("district name does not appear in its source_text")
         return district.name
+    if name in ("come_alone", "beginner_friendly") and isinstance(value, str):
+        # The schema sends booleans as "true"/"false" (no union types allowed).
+        if value.lower() not in ("true", "false"):
+            raise Unsupported(f"not true/false: {value!r}")
+        return value.lower() == "true"
     if name in JUDGEMENT_FIELDS:
         return value  # span grounding only; type checked by ListingDraft
     raise Unsupported(f"unknown field {name}")

@@ -59,8 +59,15 @@ def main() -> None:
         raw = golden_raw_record(gfile.file, gfile.source_kind, gfile.content_type, as_of)
         return extract_record(raw, backend, settings, config)
 
+    import anthropic
+
     with run_context() as run_id:
-        report = evaluate(golden, extract)
+        try:
+            report = evaluate(golden, extract)
+        except anthropic.APIStatusError as exc:
+            # 400/401/403/404: the request itself is wrong, so every document would fail.
+            raise SystemExit(f"Error: the API rejected the request ({exc.status_code}): "
+                             f"{exc.message}") from None  # fmt: skip
 
     stamp = datetime.now(UTC).strftime("%Y-%m-%d")
     name = "_".join(p for p in [stamp, settings.model, settings.effort, args.mode, args.tag] if p)

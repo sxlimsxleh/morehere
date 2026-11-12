@@ -131,3 +131,10 @@ One entry per decision: what we chose, what we rejected and why, and where the A
 ## M5 · Refusal fallback on by default
 
 - `fallbacks: "default"` (beta `server-side-fallback-2026-07-01`): if a safety classifier declines, the API retries on Anthropic's recommended model in the same call. Unlikely for this content, but a refused record would otherwise fail. A refusal of the whole chain is an `ExtractionError` and the record is retried later.
+
+## M5 · No union types in the output schema
+
+- **Where the AI got it wrong:** the first live call returned 400: the schema had 54 nullable (`anyOf ... null`) parameters, and the API compiles at most 16 union-typed parameters per schema. I had used nullables for "not stated" on every value, quote and note.
+- **Chose:** every value, quote and note is a plain string, and `""` means "nothing"; yes/no fields are `"true"`/`"false"`/`""`; prices come back as text. Code converts and type-checks while grounding. A test counts the union parameters in the schema (0) so this can't regress.
+- **Rejected:** keeping nullables only on `value` (18 fields, still over 16) or splitting the call per field group (more calls, more cost, and listings would have to be stitched back together).
+- Also: a rejected request (400/401/403/404) now stops the run with one line; network, rate-limit and server errors fail only that record.

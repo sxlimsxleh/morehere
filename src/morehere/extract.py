@@ -53,7 +53,7 @@ RECORDINGS_DIR = REPO_ROOT / "evals" / "recordings"
 
 # Bump when the prompt or schema changes: recordings are keyed on it, so stale ones are
 # never replayed against a new prompt.
-PROMPT_VERSION = "2026-11-13.1"
+PROMPT_VERSION = "2026-11-13.2"
 FALLBACK_BETA = "server-side-fallback-2026-07-01"
 
 
@@ -117,15 +117,15 @@ Return one entry in `listings` for every distinct activity or event the document
 (a newsletter can describe several). Include one-off events too; the system rejects them \
 later. Do not list a venue on its own if no activity is described there.
 
-For each field, return value, source_text and note:
+For each field, return value, source_text and note, all as strings; "" means nothing:
 - source_text is copied character for character from the document: the shortest passage \
 that states the fact, inside one line, never reworded, translated or reformatted. Every \
 value is checked against its source_text, and anything that doesn't match is discarded.
-- If the document does not state the field, set value and source_text to null. Never infer \
+- If the document does not state the field, set value and source_text to "". Never infer \
 from general knowledge, the language the page is written in, or what is "usual".
 - If the document mentions the field but it is unclear, hedged or not quite what the field \
 asks (for example "free i think?", "biweekly", a seat count instead of a group size), set \
-value to null, quote the passage in source_text and explain in note.
+value to "", quote the passage in source_text and explain in note.
 
 Fields:
 - title: the activity's name as written.
@@ -137,16 +137,17 @@ A postcode is not a district.
 - category: the kind of activity (one of the allowed values).
 - recurrence_text: the phrase saying when it repeats, verbatim ("jeden 2. Donnerstag im \
 Monat", "every wed"). For an iCal event use the RRULE value ("FREQ=WEEKLY;BYDAY=TU"). For a \
-one-off event, set value to null, quote the date passage and note "one-off".
+one-off event, set value to "", quote the date passage and note "one-off".
 - start_time / end_time: local time as HH:MM, only if written (an iCal DTSTART/DTEND counts).
 - seasonal_text: a stated seasonal pause, season or skipped dates, verbatim.
 - language: the language(s) the activity is held in: "en", "de" or "en+de". The language of \
 the page itself is not evidence.
-- price_eur: the price for taking part, in euros; 0 if stated free or donation-based. Costs \
+- price_eur: the price for taking part in euros, as text ("8", "12.50"); "0" if stated free
+  or donation-based. Costs \
 for extras (shoe rental, drinks) are not the price. price_period: per_visit, monthly, \
 per_term or donation.
-- come_alone: true only if the document says people come alone or that coming alone is fine.
-- beginner_friendly: true if it says beginners, all levels, no experience needed or similar.
+- come_alone: "true" only if the document says people come alone or that coming alone is fine.
+- beginner_friendly: "true" if it says beginners, all levels, no experience needed or similar.
 - group_size: small (under 10 people), medium (10-30), large (over 30), only from a stated \
 number of participants.
 - first_timer_info: a practical tip for a first visit (who to look for, what to bring).
@@ -161,8 +162,10 @@ observations (per listing), each with a verbatim source_text:
 """
 
 
-def _nullable(schema: dict[str, Any]) -> dict[str, Any]:
-    return {"anyOf": [schema, {"type": "null"}]}
+# No nullable or union types anywhere: the API compiles schemas with at most 16 union-typed
+# parameters (one per field would already be 18). An empty string means "not stated";
+# code converts strings to typed values while grounding.
+EMPTY = ""
 
 
 def _field_schema(name: str) -> dict[str, Any]:
@@ -171,21 +174,18 @@ def _field_schema(name: str) -> dict[str, Any]:
         "language": get_args(Language),
         "price_period": get_args(PricePeriod),
         "group_size": get_args(GroupSize),
+        "come_alone": ("true", "false"),
+        "beginner_friendly": ("true", "false"),
     }
+    value: dict[str, Any] = {"type": "string"}
     if name in enums:
-        value = _nullable({"type": "string", "enum": list(enums[name])})
-    elif name == "price_eur":
-        value = _nullable({"type": "number"})
-    elif name in ("come_alone", "beginner_friendly"):
-        value = _nullable({"type": "boolean"})
-    else:
-        value = _nullable({"type": "string"})
+        value["enum"] = [*enums[name], EMPTY]
     return {
         "type": "object",
         "properties": {
             "value": value,
-            "source_text": _nullable({"type": "string"}),
-            "note": _nullable({"type": "string"}),
+            "source_text": {"type": "string"},
+            "note": {"type": "string"},
         },
         "required": ["value", "source_text", "note"],
         "additionalProperties": False,
@@ -279,6 +279,18 @@ class AnthropicBackend:
         self._client = anthropic.Anthropic()
 
     def complete(self, settings: LlmSettings, system: str, user: str) -> LlmResponse:
+        import anthropic
+
+        try:
+            return self._create(settings, system, user)
+        except (anthropic.APIConnectionError, anthropic.RateLimitError,
+                anthropic.InternalServerError) as exc:  # fmt: skip
+            # Transient (the SDK already retried): fail this record, keep the run going.
+            raise ExtractionError(f"API unavailable: {type(exc).__name__}: {exc}") from exc
+        # Anything else (400 bad request, 401 key, 403, 404 model) is not about this
+        # document and would fail every call: it propagates and stops the run.
+
+    def _create(self, settings: LlmSettings, system: str, user: str) -> LlmResponse:
         response = self._client.beta.messages.create(
             model=settings.model,
             max_tokens=settings.max_tokens,
