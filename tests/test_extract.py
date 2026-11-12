@@ -19,6 +19,7 @@ from morehere.extract import (
     LlmSettings,
     RecordingBackend,
     ReplayBackend,
+    claims_to_reply,
     extract_record,
     golden_raw_record,
     load_llm_settings,
@@ -34,6 +35,7 @@ from morehere.ground import (
     prices_in,
     times_in,
 )
+from morehere.models import DRAFT_FIELDS
 from morehere.text import document_text, html_to_text
 
 GOLDEN = load_golden()
@@ -67,8 +69,8 @@ class FakeBackend:
     def complete(self, settings: LlmSettings, system: str, user: str) -> LlmResponse:
         self.calls.append(user)
         text = self.reply(user) if callable(self.reply) else self.reply
-        if isinstance(text, ClaimedExtraction):
-            text = text.model_dump_json()
+        if isinstance(text, ClaimedExtraction):  # answer the way the API shapes replies
+            text = claims_to_reply(text).model_dump_json()
         usage = {"input_tokens": 1000, "output_tokens": 500}
         return LlmResponse(text=text, stop_reason=self.stop_reason, model=settings.model,
                            usage=usage)  # fmt: skip
@@ -308,10 +310,25 @@ def test_live_request_uses_structured_output_effort_fallbacks_and_no_tools(
     assert sent["system"][0]["cache_control"] == {"type": "ephemeral"}
 
 
-def test_schema_requires_every_field_and_forbids_extras() -> None:
-    fields = CLAIMS_SCHEMA["properties"]["listings"]["items"]["properties"]["fields"]
-    assert fields["additionalProperties"] is False
-    assert set(fields["required"]) == set(fields["properties"])
+def test_schema_is_flat_and_closed() -> None:
+    fact = CLAIMS_SCHEMA["properties"]["listings"]["items"]["properties"]["facts"]["items"]
+    assert fact["properties"]["field"]["enum"] == list(DRAFT_FIELDS)
+    assert set(fact["required"]) == set(fact["properties"])
+
+    def closed(schema: Any) -> bool:
+        if isinstance(schema, dict):
+            if schema.get("type") == "object" and schema.get("additionalProperties") is not False:
+                return False
+            return all(closed(v) for v in schema.values())
+        return all(closed(v) for v in schema) if isinstance(schema, list) else True
+
+    assert closed(CLAIMS_SCHEMA)
+
+
+def test_schema_stays_small() -> None:
+    # The second live run failed with "compiled grammar is too large" for a schema with one
+    # object per field (6,898 characters). The flat facts schema is about 1,150.
+    assert len(json.dumps(CLAIMS_SCHEMA)) < 2000
 
 
 def test_settings_from_environment(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -470,21 +487,55 @@ def test_string_answers_are_converted_before_grounding() -> None:
 
 
 def test_model_reply_in_schema_shape_is_accepted() -> None:
-    # Exactly what the API returns: every field present, empty strings for "nothing".
-    empty = {"value": "", "source_text": "", "note": ""}
-    fields = {name: dict(empty) for name in CLAIMS_SCHEMA["properties"]["listings"]["items"]
-              ["properties"]["fields"]["properties"]}  # fmt: skip
-    fields["title"] = {"value": "Isar Morning Runners", "source_text": "ISAR MORNING RUNNERS",
-                       "note": ""}  # fmt: skip
+    # Exactly what the API returns: facts for stated fields only, "" for no note.
     meet = "Every Saturday at 9:00 we meet"
-    fields["recurrence_text"] = {"value": "Every Saturday", "source_text": meet, "note": ""}
-    fields["start_time"] = {"value": "09:00", "source_text": meet, "note": ""}
-    reply = json.dumps({"listings": [{"fields": fields, "observations": []}],
+    facts = [
+        {"field": "title", "value": "Isar Morning Runners", "source_text": "ISAR MORNING RUNNERS",
+         "note": ""},
+        {"field": "recurrence_text", "value": "Every Saturday", "source_text": meet, "note": ""},
+        {"field": "start_time", "value": "09:00", "source_text": meet, "note": ""},
+        {"field": "come_alone", "value": "", "source_text": "just show up",
+         "note": "doesn't say whether people come alone"},
+    ]  # fmt: skip
+    reply = json.dumps({"listings": [{"facts": facts, "observations": []}],
                         "injection_spans": []})  # fmt: skip
     draft = extract(gfile("07_run_club"), FakeBackend(reply)).drafts[0]
     assert draft.title.value == "Isar Morning Runners"
     assert draft.start_time.value == time(9, 0)
-    assert draft.price_eur.reason == "not stated"
+    assert draft.price_eur.reason == "not stated"  # no fact = not stated
+    assert draft.come_alone.reason == "doesn't say whether people come alone"
+
+
+def test_two_different_answers_for_one_field_are_flagged() -> None:
+    meet = "Every Saturday at 9:00 we meet"
+    facts = [
+        {"field": "start_time", "value": "09:00", "source_text": meet, "note": ""},
+        {"field": "start_time", "value": "10:00", "source_text": meet, "note": ""},
+    ]
+    reply = json.dumps({"listings": [{"facts": facts, "observations": []}],
+                        "injection_spans": []})  # fmt: skip
+    draft = extract(gfile("07_run_club"), FakeBackend(reply)).drafts[0]
+    assert draft.start_time.status == "flagged"
+    assert draft.start_time.reason == "conflicting answers for this field"
+
+
+def test_reply_round_trip_keeps_every_claim() -> None:
+    for f in GOLDEN.files:
+        claims = golden_claims(f)
+        reply = claims_to_reply(claims)
+        from morehere.extract import reply_to_claims
+
+        back = reply_to_claims(reply)
+        for original, restored in zip(claims.listings, back.listings, strict=True):
+            for name, claim in original.fields.items():
+                if claim.value is None and not claim.source_text:
+                    assert name not in restored.fields  # left out = not stated
+                    continue
+                got = restored.fields[name]
+                assert (got.source_text, got.note) == (claim.source_text, claim.note)
+                assert str(got.value).lower() == str(claim.value).lower() or (
+                    got.value is None and claim.value is None
+                )
 
 
 def test_transient_api_errors_fail_one_record_not_the_run(monkeypatch: pytest.MonkeyPatch) -> None:

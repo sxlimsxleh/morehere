@@ -138,3 +138,10 @@ One entry per decision: what we chose, what we rejected and why, and where the A
 - **Chose:** every value, quote and note is a plain string, and `""` means "nothing"; yes/no fields are `"true"`/`"false"`/`""`; prices come back as text. Code converts and type-checks while grounding. A test counts the union parameters in the schema (0) so this can't regress.
 - **Rejected:** keeping nullables only on `value` (18 fields, still over 16) or splitting the call per field group (more calls, more cost, and listings would have to be stitched back together).
 - Also: a rejected request (400/401/403/404) now stops the run with one line; network, rate-limit and server errors fail only that record.
+
+## M5 · A flat "facts" schema (second live run)
+
+- **Where the AI got it wrong (again):** after removing unions, the API rejected the schema as "compiled grammar too large": one object per field (18 objects with value/quote/note, enums inside) inside a listings array. Structured outputs compile the schema into a grammar for every output token, and big nested schemas don't fit.
+- **Chose:** each listing is a list of facts `{field, value, source_text, note}`, all strings, with `field` an enum of the 18 names; fields the document doesn't mention are left out ("not stated"). About 1,150 characters instead of 6,898. Allowed values for category, language, price period and group size moved into the prompt; code still rejects anything else while grounding. Two different answers for one field are flagged "conflicting".
+- **Rejected:** dropping structured outputs and validating free-form JSON (no shape guarantee, retries needed), or one call per group of fields (more cost, listings must be stitched together).
+- **Lesson:** I should have tested the schema against the real API with one call before building on it. Tests now pin the schema's size and shape, but only a live call proves the API accepts it.

@@ -32,7 +32,14 @@ import yaml
 from pydantic import BaseModel, ValidationError
 
 from morehere.config import CityConfig, load_city_config
-from morehere.ground import ClaimedExtraction, GroundingContext, ground_listing
+from morehere.ground import (
+    ClaimedExtraction,
+    ClaimedField,
+    ClaimedListing,
+    GroundingContext,
+    Observation,
+    ground_listing,
+)
 from morehere.logging import configure_logging, run_context, timed_step
 from morehere.models import (
     DRAFT_FIELDS,
@@ -53,7 +60,7 @@ RECORDINGS_DIR = REPO_ROOT / "evals" / "recordings"
 
 # Bump when the prompt or schema changes: recordings are keyed on it, so stale ones are
 # never replayed against a new prompt.
-PROMPT_VERSION = "2026-11-13.2"
+PROMPT_VERSION = "2026-11-13.3"
 FALLBACK_BETA = "server-side-fallback-2026-07-01"
 
 
@@ -100,7 +107,12 @@ def load_llm_settings(
 # Prompt and output schema
 # ---------------------------------------------------------------------------
 
-SYSTEM_PROMPT = """\
+
+def _choices(values: tuple[str, ...]) -> str:
+    return ", ".join(f'"{v}"' for v in values)
+
+
+SYSTEM_PROMPT = f"""\
 You extract listings for morehere., a guide that helps newcomers to Munich find recurring, \
 low-pressure activities and places where they can become regulars (language cafés, run \
 clubs, board-game nights, choirs, study groups, repair cafés and similar).
@@ -117,15 +129,16 @@ Return one entry in `listings` for every distinct activity or event the document
 (a newsletter can describe several). Include one-off events too; the system rejects them \
 later. Do not list a venue on its own if no activity is described there.
 
-For each field, return value, source_text and note, all as strings; "" means nothing:
+Each listing is a list of facts. A fact is {{field, value, source_text, note}}, all strings:
+- Add a fact only for fields the document states or mentions. Leave out fields it doesn't \
+mention at all; never infer from general knowledge, the language the page is written in, \
+or what is "usual". At most one fact per field.
 - source_text is copied character for character from the document: the shortest passage \
 that states the fact, inside one line, never reworded, translated or reformatted. Every \
 value is checked against its source_text, and anything that doesn't match is discarded.
-- If the document does not state the field, set value and source_text to "". Never infer \
-from general knowledge, the language the page is written in, or what is "usual".
 - If the document mentions the field but it is unclear, hedged or not quite what the field \
 asks (for example "free i think?", "biweekly", a seat count instead of a group size), set \
-value to "", quote the passage in source_text and explain in note.
+value to "", quote the passage in source_text and explain in note. Otherwise note is "".
 
 Fields:
 - title: the activity's name as written.
@@ -134,22 +147,21 @@ as written (no postcode or city).
 - district: a Munich district or neighbourhood name exactly as written in the document \
 (e.g. "Westend", "Haidhausen", "Schwabing"); the system maps it to an official district. \
 A postcode is not a district.
-- category: the kind of activity (one of the allowed values).
+- category: one of {_choices(get_args(Category))}.
 - recurrence_text: the phrase saying when it repeats, verbatim ("jeden 2. Donnerstag im \
 Monat", "every wed"). For an iCal event use the RRULE value ("FREQ=WEEKLY;BYDAY=TU"). For a \
 one-off event, set value to "", quote the date passage and note "one-off".
-- start_time / end_time: local time as HH:MM, only if written (an iCal DTSTART/DTEND counts).
+- start_time, end_time: local time as HH:MM, only if written (an iCal DTSTART/DTEND counts).
 - seasonal_text: a stated seasonal pause, season or skipped dates, verbatim.
-- language: the language(s) the activity is held in: "en", "de" or "en+de". The language of \
-the page itself is not evidence.
-- price_eur: the price for taking part in euros, as text ("8", "12.50"); "0" if stated free
-  or donation-based. Costs \
-for extras (shoe rental, drinks) are not the price. price_period: per_visit, monthly, \
-per_term or donation.
+- language: the language(s) the activity is held in: one of {_choices(get_args(Language))}. \
+The language of the page itself is not evidence.
+- price_eur: the price for taking part in euros, written as a number ("8", "12.50"); "0" if \
+stated free or donation-based. Costs for extras (shoe rental, drinks) are not the price.
+- price_period: one of {_choices(get_args(PricePeriod))}.
 - come_alone: "true" only if the document says people come alone or that coming alone is fine.
 - beginner_friendly: "true" if it says beginners, all levels, no experience needed or similar.
-- group_size: small (under 10 people), medium (10-30), large (over 30), only from a stated \
-number of participants.
+- group_size: one of {_choices(get_args(GroupSize))}: small is under 10 people, medium 10-30, \
+large over 30; only from a stated number of participants.
 - first_timer_info: a practical tip for a first visit (who to look for, what to bring).
 - organiser_contact: a public contact address or link of the organiser. Never the name or \
 address of a private person who forwarded or wrote the message.
@@ -162,36 +174,12 @@ observations (per listing), each with a verbatim source_text:
 """
 
 
-# No nullable or union types anywhere: the API compiles schemas with at most 16 union-typed
-# parameters (one per field would already be 18). An empty string means "not stated";
-# code converts strings to typed values while grounding.
-EMPTY = ""
-
-
-def _field_schema(name: str) -> dict[str, Any]:
-    enums: dict[str, tuple[str, ...]] = {
-        "category": get_args(Category),
-        "language": get_args(Language),
-        "price_period": get_args(PricePeriod),
-        "group_size": get_args(GroupSize),
-        "come_alone": ("true", "false"),
-        "beginner_friendly": ("true", "false"),
-    }
-    value: dict[str, Any] = {"type": "string"}
-    if name in enums:
-        value["enum"] = [*enums[name], EMPTY]
-    return {
-        "type": "object",
-        "properties": {
-            "value": value,
-            "source_text": {"type": "string"},
-            "note": {"type": "string"},
-        },
-        "required": ["value", "source_text", "note"],
-        "additionalProperties": False,
-    }
-
-
+# The schema is deliberately small and flat. The API turns it into a grammar that constrains
+# every output token, and rejects schemas that are too big: one object per field (18 of
+# them) was "too large", and nullable values hit the limit of 16 union-typed parameters.
+# So a listing is a list of {field, value, source_text, note} facts, all plain strings, with
+# no unions. Allowed values for category etc. are in the prompt; code checks them (a wrong
+# value is flagged while grounding), so the schema doesn't have to.
 CLAIMS_SCHEMA: dict[str, Any] = {
     "type": "object",
     "properties": {
@@ -200,11 +188,19 @@ CLAIMS_SCHEMA: dict[str, Any] = {
             "items": {
                 "type": "object",
                 "properties": {
-                    "fields": {
-                        "type": "object",
-                        "properties": {name: _field_schema(name) for name in DRAFT_FIELDS},
-                        "required": list(DRAFT_FIELDS),
-                        "additionalProperties": False,
+                    "facts": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "field": {"type": "string", "enum": list(DRAFT_FIELDS)},
+                                "value": {"type": "string"},
+                                "source_text": {"type": "string"},
+                                "note": {"type": "string"},
+                            },
+                            "required": ["field", "value", "source_text", "note"],
+                            "additionalProperties": False,
+                        },
                     },
                     "observations": {
                         "type": "array",
@@ -222,7 +218,7 @@ CLAIMS_SCHEMA: dict[str, Any] = {
                         },
                     },
                 },
-                "required": ["fields", "observations"],
+                "required": ["facts", "observations"],
                 "additionalProperties": False,
             },
         },
@@ -231,6 +227,74 @@ CLAIMS_SCHEMA: dict[str, Any] = {
     "required": ["listings", "injection_spans"],
     "additionalProperties": False,
 }
+
+
+class Fact(BaseModel):
+    field: str
+    value: str
+    source_text: str
+    note: str
+
+
+class ReplyListing(BaseModel):
+    facts: list[Fact]
+    observations: list[Observation]
+
+
+class ModelReply(BaseModel):
+    """The model's reply exactly as the schema shapes it."""
+
+    listings: list[ReplyListing]
+    injection_spans: list[str]
+
+
+def reply_to_claims(reply: ModelReply) -> ClaimedExtraction:
+    """Facts -> one ClaimedField per field. Two different answers for one field = unclear."""
+    listings = []
+    for listing in reply.listings:
+        fields: dict[str, ClaimedField] = {}
+        for fact in listing.facts:
+            if fact.field not in DRAFT_FIELDS:
+                continue
+            claim = ClaimedField(value=fact.value, source_text=fact.source_text, note=fact.note)
+            earlier = fields.get(fact.field)
+            if earlier is not None and earlier.value != claim.value:
+                claim = ClaimedField(source_text=earlier.source_text,
+                                     note="conflicting answers for this field")  # fmt: skip
+            fields[fact.field] = claim
+        listings.append(ClaimedListing(fields=fields, observations=listing.observations))
+    return ClaimedExtraction(listings=listings, injection_spans=reply.injection_spans)
+
+
+def _as_text(value: Any) -> str:
+    if value is None:
+        return ""
+    if isinstance(value, bool):
+        return "true" if value else "false"
+    return str(value)
+
+
+def claims_to_reply(claims: ClaimedExtraction) -> ModelReply:
+    """The reply a model would send for these claims (tests and the perfect-model eval)."""
+    return ModelReply(
+        listings=[
+            ReplyListing(
+                facts=[
+                    Fact(
+                        field=name,
+                        value=_as_text(c.value),
+                        source_text=c.source_text or "",
+                        note=c.note or "",
+                    )  # fmt: skip
+                    for name, c in listing.fields.items()
+                    if c.value is not None or c.source_text
+                ],
+                observations=listing.observations,
+            )
+            for listing in claims.listings
+        ],
+        injection_spans=claims.injection_spans,
+    )
 
 
 def user_message(document: str, raw: RawRecord) -> str:
@@ -413,7 +477,7 @@ def extract_record(
     if response.stop_reason == "max_tokens":
         raise ExtractionError(f"{raw.raw_record_id}: output cut off at max_tokens")
     try:
-        claims = ClaimedExtraction.model_validate_json(response.text)
+        claims = reply_to_claims(ModelReply.model_validate_json(response.text))
     except ValidationError as exc:
         raise ExtractionError(f"{raw.raw_record_id}: output does not match the schema") from exc
 
