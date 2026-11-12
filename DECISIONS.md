@@ -56,3 +56,27 @@ One entry per decision: what we chose, what we rejected and why, and where the A
 ## M2 · Vector column waits for the search milestone
 
 - **Chose:** enable the `vector` extension now, add the embedding column when we pick the embedding model (its dimension is part of the column type).
+
+## M3 · Parse from the stored payload, never from the HTTP response
+
+- **Chose:** every run stores the Overpass response as a `RawRecord` first, then parses what was stored. `make osm-replay` re-runs parsing with no network.
+- **Rejected:** parse-then-store. It's one step shorter, but a parser bug would then need a new fetch to fix, and Overpass is slow and rate-limited.
+
+## M3 · District by location, with PostGIS assembling the boundaries
+
+- **Chose:** load the 25 Stadtbezirk relations from OSM (`out geom`) and let `ST_BuildArea` turn their member ways into polygons (handles split ways and holes); every located place gets its district by `ST_Covers`. Location beats any district name in text, which settles the "Giesing could be two districts" flags from M1 for anything with coordinates.
+- **Rejected:** assembling rings in Python (shapely or hand-written): more code to get wrong, and one more dependency.
+
+## M3 · Places that disappear from OSM are reported, not deleted
+
+- **Chose:** `places.last_seen_at`; each run logs `places_not_seen_this_run`. Milestone 6 decides when a place is hidden.
+- **Rejected:** deleting missing places. One broken Overpass response (it does return partial results on timeouts) would wipe listings' places.
+
+## M3 · Retries: 429/5xx/network errors and Overpass "remark" errors, never 4xx
+
+- **Chose:** tenacity, up to 4 attempts, exponential backoff, `Retry-After` honoured (capped at 2 min). Overpass sometimes answers 200 with `"remark": "runtime error: Query timed out"`; that counts as a failure and is retried.
+- **Where the AI got it wrong:** the module logger was named `__name__`, which is `"__main__"` under `python -m`, so the CLI's logs bypassed the JSON handler and printed as plain text. Caught on the first real run; loggers are now named explicitly, with a regression test.
+
+## M3 · Real Overpass run not yet done from the cloud session
+
+- overpass-api.de resets the TLS connection from the cloud environment (the proxy allows it; the server refuses), and the overpass.kumi.systems mirror timed out. All behaviour is tested against hand-built fixtures; the first real run happens locally with `make osm-districts && make osm`.

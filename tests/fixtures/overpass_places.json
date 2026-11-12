@@ -1,0 +1,122 @@
+{
+ "version": 0.6,
+ "generator": "hand-built test fixture (not real OSM data)",
+ "elements": [
+  {
+   "type": "node",
+   "id": 1001,
+   "lat": 48.137,
+   "lon": 11.576,
+   "tags": {
+    "amenity": "cafe",
+    "name": "Café Lindwurm",
+    "addr:street": "Teststraße",
+    "addr:housenumber": "1",
+    "addr:postcode": "80331",
+    "internet_access": "wlan",
+    "fax": "+49 89 000000"
+   }
+  },
+  {
+   "type": "way",
+   "id": 2001,
+   "center": {
+    "lat": 48.15,
+    "lon": 11.57
+   },
+   "tags": {
+    "amenity": "library",
+    "name": "Lesesaal Test",
+    "opening_hours": "Mo-Fr 10:00-19:00"
+   }
+  },
+  {
+   "type": "node",
+   "id": 1002,
+   "lat": 48.1371,
+   "lon": 11.5761,
+   "tags": {
+    "amenity": "cafe"
+   }
+  },
+  {
+   "type": "node",
+   "id": 1003,
+   "lat": 48.1372,
+   "lon": 11.5762,
+   "tags": {
+    "amenity": "bench",
+    "name": "Bench"
+   }
+  },
+  {
+   "type": "relation",
+   "id": 3001,
+   "center": {
+    "lat": 48.1495,
+    "lon": 11.564
+   },
+   "tags": {
+    "amenity": "arts_centre",
+    "name": "Kulturhaus Test",
+    "addr:street": "Hofweg"
+   }
+  },
+  {
+   "type": "node",
+   "id": 1004,
+   "lat": 48.13,
+   "lon": 11.6,
+   "tags": {
+    "office": "coworking",
+    "name": "CoWork Test"
+   }
+  },
+  {
+   "type": "node",
+   "id": 1005,
+   "lat": 48.138,
+   "lon": 11.58,
+   "tags": {
+    "leisure": "hackerspace",
+    "name": "Makerspace Test"
+   }
+  },
+  {
+   "type": "way",
+   "id": 2002,
+   "center": {
+    "lat": 48.152,
+    "lon": 11.56
+   },
+   "tags": {
+    "sport": "climbing",
+    "leisure": "sports_centre",
+    "name": "Kletterhalle Test"
+   }
+  },
+  {
+   "type": "way",
+   "id": 2003,
+   "tags": {
+    "amenity": "cafe",
+    "name": "Ghost Café"
+   }
+  },
+  {
+   "type": "node",
+   "id": 1001,
+   "lat": 48.137,
+   "lon": 11.576,
+   "tags": {
+    "amenity": "cafe",
+    "name": "Café Lindwurm",
+    "addr:street": "Teststraße",
+    "addr:housenumber": "1",
+    "addr:postcode": "80331",
+    "internet_access": "wlan",
+    "fax": "+49 89 000000"
+   }
+  }
+ ]
+}

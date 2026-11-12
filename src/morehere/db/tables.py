@@ -17,7 +17,7 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Any
 
-from geoalchemy2 import Geography
+from geoalchemy2 import Geography, Geometry
 from sqlalchemy import (
     BigInteger,
     Boolean,
@@ -27,6 +27,7 @@ from sqlalchemy import (
     ForeignKey,
     Identity,
     Index,
+    Integer,
     MetaData,
     Numeric,
     String,
@@ -112,10 +113,31 @@ class PlaceRow(Base):
     osm_id: Mapped[str | None] = mapped_column(Text, unique=True)
     kind: Mapped[str] = mapped_column(Text, nullable=False)
     osm_tags: Mapped[dict[str, str]] = mapped_column(JSONB, nullable=False, server_default="{}")
+    # When an ingestion run last saw this place in its source. A place missing from
+    # recent runs is reported, never deleted here; freshness rules decide (milestone 6).
+    last_seen_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = _created_at()
     updated_at: Mapped[datetime] = _updated_at()
 
     __table_args__ = (Index("ix_places_geo", "geo", postgresql_using="gist"),)
+
+
+class DistrictRow(Base):
+    """A Stadtbezirk boundary from OSM, used to give places a district by location."""
+
+    __tablename__ = "districts"
+
+    number: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=False)
+    name: Mapped[str] = mapped_column(Text, nullable=False, unique=True)
+    osm_id: Mapped[str] = mapped_column(Text, nullable=False)
+    # geometry (not geography): point-in-polygon on a city-sized area doesn't need
+    # the curved-earth maths, and geometry has the richer set of functions.
+    geom: Mapped[Any] = mapped_column(
+        Geometry(geometry_type="MULTIPOLYGON", srid=4326, spatial_index=False), nullable=False
+    )
+    updated_at: Mapped[datetime] = _updated_at()
+
+    __table_args__ = (Index("ix_districts_geom", "geom", postgresql_using="gist"),)
 
 
 class EvidenceRow(Base):

@@ -63,6 +63,7 @@ src/morehere/
     seed.py                  # load config/sources.yaml into the registry
     migrations/              # Alembic; migrations written by hand, drift checked by a test
   sources/                   # one module per source: osm.py, ical.py, submission.py, email_inbox.py
+                             #   each: fetch -> store RawRecord -> parse the STORED payload -> upsert
   ingest.py                  # fetch -> store RawRecord (hash, dedupe), per-source registry entry
   extract.py                 # Claude tool-use extraction -> ListingDraft
   ground.py                  # grounding check; time/day/price parsing (German + English)
@@ -71,12 +72,12 @@ src/morehere/
   score.py                   # Regular Score (deterministic, weights from config)
   freshness.py               # last_verified, hide stale
   api/                       # FastAPI app
-  logging.py                 # JSON logger with run_id
+  logging.py                 # JSON logs: run_context(), timed_step(); loggers named morehere.*
 admin/curate.py              # Streamlit curator queue: approve, fix, merge, verify
 evals/run_evals.py           # field accuracy, flag precision/recall, recurrence accuracy, merge precision
 evals/recordings/            # recorded LLM responses so CI runs without an API key
 app/                         # Expo app (later)
-tests/
+tests/                       # tests/fixtures: hand-built API responses (not real data)
 DECISIONS.md                 # decision, rejected alternative, where the AI got it wrong
 ```
 
@@ -126,6 +127,9 @@ make seed      # load the source registry
 make test      # pytest; db tests skip if Postgres is down
 make test-db   # db tests only; fail if Postgres is down (CI)
 make lint      # ruff check + format check
+make osm-districts  # OSM Stadtbezirk boundaries (needs overpass-api.de)
+make osm       # OSM places base layer
+make osm-replay  # re-parse the latest stored OSM payload, no network
 make evals     # live evals (needs key); make evals-recorded for CI
 make admin     # streamlit curator admin
 make api       # uvicorn API

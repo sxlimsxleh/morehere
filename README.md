@@ -4,7 +4,7 @@
 
 A scout that helps people new to Munich become a regular somewhere: it finds the recurring groups, work-friendly cafés and community spaces where the same faces show up week after week, and nudges you to keep going back.
 
-**Status:** milestone 2 (database) done: Postgres with PostGIS and pgvector, migrations, source registry. See [CLAUDE.md](CLAUDE.md) for the design rules and milestones.
+**Status:** milestone 3 (OSM places layer) done: places and district boundaries from OpenStreetMap, stored raw first, with JSON logs per run. See [CLAUDE.md](CLAUDE.md) for the design rules and milestones.
 
 ## Run it
 
@@ -13,8 +13,12 @@ make setup     # uv sync
 make db        # Postgres 16 + PostGIS + pgvector in Docker
 make migrate   # create the tables
 make seed      # load the source registry
+make osm-districts  # Munich's 25 district boundaries from OpenStreetMap
+make osm       # cafés, libraries, community centres, coworking, makerspaces, climbing
 make test      # all tests (database tests skip if Postgres isn't running)
 ```
+
+Place data © OpenStreetMap contributors, available under the [ODbL](https://opendatacommons.org/licenses/odbl/).
 
 ## What's here
 
