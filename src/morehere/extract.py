@@ -261,10 +261,21 @@ class Backend(Protocol):
     def complete(self, settings: LlmSettings, system: str, user: str) -> LlmResponse: ...
 
 
+class MissingCredentials(RuntimeError):
+    """No API key: stop before any call instead of failing on every document."""
+
+
 class AnthropicBackend:
     def __init__(self) -> None:
         import anthropic  # imported here so tests and replays don't need it configured
 
+        # An empty variable counts as missing (python-dotenv won't override it from .env).
+        if not (os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("ANTHROPIC_AUTH_TOKEN")):
+            raise MissingCredentials(
+                "ANTHROPIC_API_KEY is not set. Put it in .env (cp .env.example .env, then paste "
+                "the key after ANTHROPIC_API_KEY=). If the variable exists but is empty in your "
+                "shell, run `unset ANTHROPIC_API_KEY` first: .env never overrides it."
+            )
         self._client = anthropic.Anthropic()
 
     def complete(self, settings: LlmSettings, system: str, user: str) -> LlmResponse:
@@ -470,7 +481,10 @@ def main(argv: list[str] | None = None) -> None:
             return
 
         settings = load_llm_settings()
-        backend = AnthropicBackend()
+        try:
+            backend = AnthropicBackend()
+        except MissingCredentials as exc:
+            raise SystemExit(f"Error: {exc}") from None
         config = load_city_config()
         with session_scope(engine) as session:
             pending = repo.raw_records_without_drafts(session, exclude_source_ids=["osm-overpass"])

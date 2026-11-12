@@ -21,6 +21,7 @@ from morehere.evaluation import evaluate, to_json, to_markdown
 from morehere.extract import (
     AnthropicBackend,
     Backend,
+    MissingCredentials,
     RecordingBackend,
     ReplayBackend,
     extract_record,
@@ -47,9 +48,12 @@ def main() -> None:
     config = load_city_config()
     golden = load_golden()
     as_of = datetime.fromisoformat(golden.as_of)
-    backend: Backend = (
-        RecordingBackend(AnthropicBackend()) if args.mode == "live" else ReplayBackend()
-    )
+    try:
+        backend: Backend = (
+            RecordingBackend(AnthropicBackend()) if args.mode == "live" else ReplayBackend()
+        )
+    except MissingCredentials as exc:
+        raise SystemExit(f"Error: {exc}") from None
 
     def extract(gfile: GoldenFile):  # type: ignore[no-untyped-def]
         raw = golden_raw_record(gfile.file, gfile.source_kind, gfile.content_type, as_of)

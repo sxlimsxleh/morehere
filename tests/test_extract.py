@@ -422,3 +422,12 @@ def test_samples_are_extracted_once_into_the_draft_queue(db_engine: Engine) -> N
             r for r in repo.raw_records_without_drafts(s)
             if r.raw_record_id.startswith("sample-")
         ]  # fmt: skip
+
+
+def test_missing_key_stops_before_any_call(monkeypatch: pytest.MonkeyPatch) -> None:
+    from morehere.extract import AnthropicBackend, MissingCredentials
+
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "")  # set but empty: .env would not override it
+    monkeypatch.delenv("ANTHROPIC_AUTH_TOKEN", raising=False)
+    with pytest.raises(MissingCredentials, match="unset ANTHROPIC_API_KEY"):
+        AnthropicBackend()
