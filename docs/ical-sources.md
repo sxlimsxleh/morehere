@@ -12,6 +12,10 @@ Researched 12 Nov 2026 by web search. The cloud dev session can't open these sit
 | **Venue and community-centre websites** (Nachbarschaftstreffs, Kulturhäuser, Repair Cafés) | Unknown per site. Many German community sites run WordPress "The Events Calendar", which exposes `?ical=1`. | **High.** This is where the recurring things are: e.g. a Monday Repair Café at KAP 37, a monthly one at Nachbarschaftstreff Blumenau, weekly Sprachcafés at Kulturhaus Milbertshofen (seen via listings sites). | The venue's own published feed: `public_feed`. |
 | **Listings sites** (in-muenchen.de, rausgegangen.de) | Some listings exist; feeds not checked. | They show what exists, but they're aggregators/competitors. | **Don't scrape** (rule 5). Use them to discover venues, then go to the venue's own feed or ask the organiser. |
 
+## First real probe (12 Nov 2026)
+
+Luma's Munich Discover feed (`api.lu.ma/ics/get?entity=discover&id=discplace-...`, "What's Happening in Munich"): valid iCal, **20 upcoming events, 0 RRULEs, 0 inferred series, 20 one-offs**. It is a capped, curated shop window that lists each event once, so it can never show a rhythm. **Not a registry source**, but a good discovery tool: several titles carry edition numbers ("Knight Gambit Vol.14", "Brunch & Workshop #3", "Drip & Draw Vol. 2"), which suggests a series whose other dates are on the host's own Luma calendar. The probe now lists these as `series_hints` with their event link; follow the link to the host calendar and probe that.
+
 ## What this means
 
 1. iCal will be a **useful but secondary** source. The best recurring content sits on small venue sites and Meetup groups, not in big feeds.

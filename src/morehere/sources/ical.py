@@ -15,6 +15,7 @@ from __future__ import annotations
 import argparse
 import json
 import logging
+import re
 import time
 from collections import defaultdict
 from collections.abc import Callable
@@ -170,12 +171,62 @@ def event_schedule(event: ICalEvent) -> Schedule | None:
     )
 
 
+# Edition markers: the part of a title that changes from one date of a series to the
+# next ("Knight Gambit Vol.14", "Brunch & Workshop #3", "Reading Session · Night 1").
+# Bare numbers are NOT removed: "5k Run Club" or "Repair Café 246" mean something.
+_EDITION_MARKERS = re.compile(
+    r"""
+    \bvol(?:ume)?\.?\s*(?:\d+|[ivx]+)\b            # Vol.14, Volume 2, vol. II
+    | \#\s*\d+                                     # #3
+    | \b(?:no|nr)\.?\s*\d+\b                       # No. 5, Nr. 5
+    | \b(?:night|part|teil|edition|ausgabe|episode|ep|folge|round|runde|chapter|kapitel)
+      \.?\s*\d+\b                                  # Night 1, Teil 2, Edition 7
+    | \b\d+(?:st|nd|rd|th)\s+edition\b              # 3rd edition
+    | \b\d+\.\s*(?:ausgabe|edition)                  # 7. Ausgabe
+    """,
+    re.IGNORECASE | re.VERBOSE,
+)
+_SEPARATORS = " ·-–—|:,/"
+
+
+def series_title(summary: str) -> str:
+    """The title without edition markers, for grouping and display.
+
+    "Ambient Reading Session vol. 1 · Night 1" -> "Ambient Reading Session"
+    """
+    stripped = _EDITION_MARKERS.sub(" ", summary)
+    stripped = re.sub(r"\s*([·|–—-])\s*(?:[·|–—-]\s*)+", r" \1 ", stripped)  # "a · · b"
+    stripped = re.sub(r"\s+([:,])", r"\1", stripped)  # "The : Poetry" -> "The: Poetry"
+    return normalise_whitespace(stripped).strip(_SEPARATORS) or summary
+
+
+def has_edition_marker(summary: str) -> bool:
+    return _EDITION_MARKERS.search(summary) is not None
+
+
 def _series_key(event: ICalEvent) -> tuple[str, str]:
-    return (event.summary.casefold(), (event.location or "").casefold())
+    # Letters and digits only: emoji and punctuation differences don't split a series.
+    words = re.findall(r"[^\W_]+", series_title(event.summary).casefold())
+    return (" ".join(words), (event.location or "").casefold())
+
+
+_URL = re.compile(r"https?://[^\s<>\"']+")
+
+
+def event_link(event: ICalEvent) -> str | None:
+    """The event's page: its URL property, or the first link in its description/location."""
+    if event.url:
+        return event.url
+    for text in (event.description, event.location):
+        match = _URL.search(text or "")
+        if match:
+            return match.group(0).rstrip(".,;)")
+    return None
 
 
 def infer_series(events: list[ICalEvent], min_occurrences: int = 3) -> list[InferredSeries]:
-    """Group dated one-off events by (title, place) and keep groups that follow a rule."""
+    """Group dated events by (title without edition markers, place) and keep the groups
+    that follow a rule: "Knight Gambit Vol.13/14/15" on three Tuesdays is one series."""
     groups: dict[tuple[str, str], list[ICalEvent]] = defaultdict(list)
     for event in events:
         if event.rrule is None and not event.cancelled and event.start is not None:
@@ -190,7 +241,7 @@ def infer_series(events: list[ICalEvent], min_occurrences: int = 3) -> list[Infe
             continue
         series.append(
             InferredSeries(
-                summary=group[0].summary,
+                summary=series_title(group[0].summary),
                 location=group[0].location,
                 rrule=rrule,
                 first_start=starts[0],
@@ -235,6 +286,18 @@ def summarise(feed: ParsedFeed, now: datetime | None = None) -> dict[str, Any]:
             for s in series
         ],
         "sample_one_offs": sorted({e.summary for e in one_offs})[:10],
+        # Numbered one-offs ("Vol.14", "#3") are probably one date of a series whose other
+        # dates are on the host's own calendar: follow the link and probe that calendar.
+        "series_hints": [
+            {
+                "summary": e.summary,
+                "series_title": series_title(e.summary),
+                "start": e.start,
+                "link": event_link(e),
+            }
+            for e in sorted(one_offs, key=lambda e: e.start or datetime.min)
+            if has_edition_marker(e.summary)
+        ],
     }
 
 
