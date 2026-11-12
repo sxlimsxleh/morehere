@@ -100,3 +100,10 @@ One entry per decision: what we chose, what we rejected and why, and where the A
 ## M4 · Occurrences: walk the rule once
 
 - **Where the AI got it wrong:** `next_occurrences` first called `rule.after()` in a loop, which recomputes from dtstart on every call (quadratic); a test with a long walk took 7 s. Now it iterates `rule.xafter()` once, with a cap.
+
+## M4+ · Series group on titles without edition numbers
+
+- **Why:** the first real probe (Luma Munich Discover feed) showed numbered titles ("Knight Gambit Vol.14", "Brunch & Workshop #3"). Grouping by exact title would split one series into one-offs.
+- **Chose:** strip explicit edition markers only (Vol./#/No./Nr./Night/Teil/Edition/Ausgabe + number) and compare letters and digits, so emoji and punctuation don't split a series either. Weekday, local start time and place must still match, so the rule is no looser.
+- **Rejected:** stripping all numbers. "5k Run Club" and "Repair Café 246" would lose meaning, and unrelated events would merge.
+- **Added:** `series_hints` in the probe output: numbered one-offs with their event link, so a discover feed points to the host calendars worth probing.

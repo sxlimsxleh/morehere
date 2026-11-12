@@ -179,3 +179,99 @@ def test_ingest_fetches_registry_feeds_and_stores_them_raw(engine: Engine) -> No
     with session_scope(engine) as s:
         record = repo.latest_raw_record(s, "ical-test-community")
         assert record is not None and record.payload == DATED
+
+
+# --- Series across numbered titles, and hints from discover feeds -------------
+
+
+# Real titles from the Luma "What's Happening in Munich" discover feed (12 Nov 2026).
+@pytest.mark.parametrize(
+    ("summary", "base", "numbered"),
+    [
+        ("Knight Gambit Vol.14", "Knight Gambit", True),
+        ("Ambient Reading Session vol. 1 · Night 1", "Ambient Reading Session", True),
+        ("Bumble x Plex Drip & Draw Vol. 2", "Bumble x Plex Drip & Draw", True),
+        ("Industrial AI Night Vol. 1", "Industrial AI Night", True),
+        ("Stammtisch Nr. 12 – Westend", "Stammtisch – Westend", True),
+        ("Kreativabend Teil 2", "Kreativabend", True),
+        ("The 3rd Edition: Poetry Slam", "The: Poetry Slam", True),
+        # Not edition markers: numbers that are part of the name stay.
+        (
+            "Energy Stammtisch in Munich @ Proxima Fusion",
+            "Energy Stammtisch in Munich @ Proxima Fusion",
+            False,
+        ),  # noqa: E501
+        ("5k Run Club", "5k Run Club", False),
+        ("Repair Café 246", "Repair Café 246", False),
+        ("Industrial AI Night", "Industrial AI Night", False),
+    ],
+)
+def test_series_title_strips_edition_markers_only(summary: str, base: str, numbered: bool) -> None:
+    assert ical.series_title(summary) == base
+    assert ical.has_edition_marker(summary) is numbered
+
+
+def _vevent(uid: str, summary: str, start: str, extra: str = "") -> str:
+    return (
+        f"BEGIN:VEVENT\r\nUID:{uid}\r\nDTSTART;TZID=Europe/Berlin:{start}\r\n"
+        f"DTEND;TZID=Europe/Berlin:{start[:9]}230000\r\nSUMMARY:{summary}\r\n"
+        f"LOCATION:Schachcafé Test\\, Zugweg 1\\, München\r\n{extra}END:VEVENT\r\n"
+    )
+
+
+def _calendar(*events: str) -> str:
+    return (
+        "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//test//EN\r\n"
+        + "".join(events)
+        + "END:VCALENDAR\r\n"
+    )  # noqa: E501
+
+
+def test_numbered_editions_on_the_same_weekday_form_one_series() -> None:
+    feed = ical.parse_feed(
+        _calendar(
+            _vevent("k13", "Knight Gambit Vol.13", "20261027T190000"),
+            _vevent("k14", "Knight Gambit Vol.14 ♟️", "20261103T190000"),  # emoji: same series
+            _vevent("k15", "Knight Gambit Vol. 15", "20261110T190000"),
+        )
+    )
+    [series] = ical.infer_series(feed.events)
+    assert series.summary == "Knight Gambit"
+    assert series.rrule == "FREQ=WEEKLY;BYDAY=TU"
+    assert series.occurrences == 3
+
+
+def test_numbered_titles_still_need_a_regular_rhythm() -> None:
+    feed = ical.parse_feed(
+        _calendar(
+            _vevent("k1", "Knight Gambit Vol.1", "20261027T190000"),  # Tuesday
+            _vevent("k2", "Knight Gambit Vol.2", "20261105T190000"),  # Thursday
+            _vevent("k3", "Knight Gambit Vol.3", "20261110T190000"),  # Tuesday
+        )
+    )
+    assert ical.infer_series(feed.events) == []
+
+
+def test_discover_feed_gives_hints_with_links_to_follow() -> None:
+    feed = ical.parse_feed(
+        _calendar(
+            _vevent(
+                "kg",
+                "Knight Gambit Vol.14",
+                "20261117T190000",
+                "DESCRIPTION:Get up-to-date information at: https://lu.ma/knight-14\\n\\nChess!\r\n",
+            ),
+            _vevent("dw", "Drip & Draw Vol. 2", "20261118T190000", "URL:https://lu.ma/dd2\r\n"),
+            _vevent("es", "Energy Stammtisch in Munich", "20261119T190000"),
+        )
+    )
+    hints = ical.summarise(feed, NOW)["series_hints"]
+    assert [(h["series_title"], h["link"]) for h in hints] == [
+        ("Knight Gambit", "https://lu.ma/knight-14"),
+        ("Drip & Draw", "https://lu.ma/dd2"),
+    ]
+
+
+def test_series_are_not_listed_as_hints() -> None:
+    hints = ical.summarise(ical.parse_feed(DATED), NOW)["series_hints"]
+    assert hints == []
