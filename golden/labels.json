@@ -6,9 +6,11 @@
     "fields": "A field listed with value + source_text is stated in the source. A field that is not listed is not stated, so extraction must flag it as 'not stated'. A field listed with 'flagged' is mentioned but unusable (ambiguous, hedged, or not what it looks like); source_text then points at the problem.",
     "source_text": "A verbatim span of the raw file (whitespace runs count as one space). Kept short and inside one line.",
     "address": "Street and house number only, as written.",
-    "district": "Canonical Stadtbezirk name from config/munich.yaml, only when a district or neighbourhood name appears in the text. Postcodes do not count. An alias that maps to two districts is flagged.",
-    "price": "Free means price_eur 0 and price_period per_visit. Donation-based means price_eur 0 and price_period donation.",
-    "group_size": "small: under 10 people (an explicit 'max 10' counts as small), medium: 10-30, large: over 30. Seats in a room are not a group size.",
+    "district": "Canonical Stadtbezirk name from config/munich.yaml, only when the text states where it is (a district or neighbourhood name as a location, e.g. 'in Neuhausen', 'im Westend', an address line ending in 'Sendling'). A venue's name ('Lesesaal Au') is not a location statement. Postcodes do not count. An alias that maps to two districts is flagged.",
+    "price": "price_eur 0 when stated free or donation-based. price_period only when the text states it (per evening, per person, im Monat, donation-based); free entry alone does not state a period.",
+    "group_size": "small: up to 10 people (an explicit 'max 10' counts as small), medium: 11-30, large: over 30. Seats in a room are not a group size.",
+    "first_timer_info": "A practical tip for a first visit, copied word for word from the text (it is shown to users as advice, so no paraphrase).",
+    "also_ok": "Optional on a field: other values that are also right for a judgement call (scored as correct).",
     "times": "Local wall-clock HH:MM.",
     "expected_rrule": "The schedule code should derive (milestone 4). null when no reliable schedule can be derived.",
     "observations": "Spans a correct extraction quotes for model-reported flags (cancelled, uncertain_source). Other flags are derived by code: not_recurring/ambiguous_recurrence from the recurrence phrase, missing_time from the start time, stale from source_updated_at, suspected_injection from injection_text or a pattern check.",
@@ -38,7 +40,6 @@
             "end_time": {"value": "21:00", "source_text": "DTEND;TZID=Europe/Berlin:20260908T210000"},
             "language": {"value": "en+de", "source_text": "Practise German or English over coffee"},
             "price_eur": {"value": 0, "source_text": "Entry is free, just order a drink at the bar."},
-            "price_period": {"value": "per_visit", "source_text": "Entry is free, just order a drink at the bar."},
             "come_alone": {"value": true, "source_text": "Most people come alone, so don't be shy!"},
             "beginner_friendly": {"value": true, "source_text": "All levels welcome, from A1 to native."},
             "group_size": {"value": "medium", "source_text": "Usually 15-25 people."},
@@ -67,9 +68,7 @@
             "category": {"value": "language_exchange", "source_text": "Our favourite language café is still going strong."},
             "recurrence_text": {"value": "Every Tuesday", "source_text": "Every Tuesday from 7pm at"},
             "start_time": {"value": "19:00", "source_text": "Every Tuesday from 7pm at"},
-            "price_eur": {"value": 0, "source_text": "Free, you just buy a drink."},
-            "price_period": {"value": "per_visit", "source_text": "Free, you just buy a drink."},
-            "beginner_friendly": {"value": true, "source_text": "Great if you're nervous about speaking German - nobody judges."}
+            "price_eur": {"value": 0, "source_text": "Free, you just buy a drink."}
           }
         },
         {
@@ -84,8 +83,7 @@
             "category": {"value": "outdoors", "source_text": "LANTERN WALK THROUGH THE ENGLISCHER GARTEN"},
             "recurrence_text": {"flagged": "one-off event", "source_text": "One night only: Saturday 21 November, 5:30pm"},
             "start_time": {"value": "17:30", "source_text": "One night only: Saturday 21 November, 5:30pm"},
-            "price_eur": {"value": 12, "source_text": "Tickets 12 EUR on our website."},
-            "price_period": {"value": "per_visit", "source_text": "Tickets 12 EUR on our website."}
+            "price_eur": {"value": 12, "source_text": "Tickets 12 EUR on our website."}
           }
         }
       ]
@@ -103,6 +101,7 @@
           "flags": [],
           "expected_rrule": "FREQ=MONTHLY;BYDAY=2TH",
           "fields": {
+            "first_timer_info": {"value": "ihr könnt aber auch eigene mitbringen", "source_text": "Wir haben über 80 Spiele im Regal, ihr könnt aber auch eigene mitbringen."},
             "title": {"value": "Brettspielabend", "source_text": "Brettspielabend"},
             "place_name": {"value": "Treffpunkt Ligsalz", "source_text": "Treffpunkt Ligsalz · Ligsalzstraße 30 · 80339 München"},
             "address": {"value": "Ligsalzstraße 30", "source_text": "Treffpunkt Ligsalz · Ligsalzstraße 30 · 80339 München"},
@@ -112,7 +111,6 @@
             "start_time": {"value": "19:00", "source_text": "Jeden 2. Donnerstag im Monat ab 19 Uhr wird bei uns gespielt."},
             "language": {"value": "de", "source_text": "Gespielt wird meistens auf Deutsch, viele erklären aber gern auf Englisch."},
             "price_eur": {"value": 0, "source_text": "Eintritt frei, Spenden für neue Spiele sind willkommen."},
-            "price_period": {"value": "per_visit", "source_text": "Eintritt frei, Spenden für neue Spiele sind willkommen."},
             "come_alone": {"value": true, "source_text": "Neue Gesichter sind immer willkommen – auch wenn ihr allein kommt!"}
           }
         }
@@ -141,7 +139,6 @@
             "end_time": {"value": "21:30", "source_text": "When: every first Monday of the month, 7:30pm to 9:30pm"},
             "language": {"value": "en", "source_text": "Conversation is in English."},
             "price_eur": {"value": 0, "source_text": "Free, but please bring at least one book to swap."},
-            "price_period": {"value": "per_visit", "source_text": "Free, but please bring at least one book to swap."},
             "group_size": {"value": "small", "source_text": "We're a small group of 6-10 people"},
             "first_timer_info": {"value": "Please bring at least one book to swap.", "source_text": "Free, but please bring at least one book to swap."},
             "organiser_contact": {"value": "bookswap.munich@mail.example", "source_text": "Questions? bookswap.munich@mail.example"}
@@ -200,7 +197,6 @@
             "recurrence_text": {"flagged": "one-off event", "source_text": "This is a one-time event."},
             "start_time": {"value": "18:00", "source_text": "Saturday 12 December 2026, 6pm"},
             "price_eur": {"value": 0, "source_text": "Free, you pay for your own drinks."},
-            "price_period": {"value": "per_visit", "source_text": "Free, you pay for your own drinks."},
             "come_alone": {"value": true, "source_text": "Everyone welcome, come alone or bring friends."}
           }
         }
@@ -227,7 +223,6 @@
             "start_time": {"value": "09:00", "source_text": "Every Saturday at 9:00 we meet"},
             "language": {"value": "en+de", "source_text": "We chat in English and German."},
             "price_eur": {"value": 0, "source_text": "It's free and there's nothing to sign up for, just show up."},
-            "price_period": {"value": "per_visit", "source_text": "It's free and there's nothing to sign up for, just show up."},
             "beginner_friendly": {"value": true, "source_text": "All paces, nobody gets left behind."},
             "first_timer_info": {"value": "Say hi to whoever is holding the orange flag.", "source_text": "New? Say hi to whoever is holding the orange flag."}
           }
@@ -278,6 +273,7 @@
           "flags": ["missing_time"],
           "expected_rrule": "FREQ=WEEKLY;BYDAY=FR",
           "fields": {
+            "first_timer_info": {"value": "Bring a game or play one of ours.", "source_text": "Bring a game or play one of ours."},
             "title": {"value": "Würfel & Worte", "source_text": "Würfel & Worte – board-game night"},
             "place_name": {"value": "Café Kiebitz", "source_text": "Every Friday at Café Kiebitz in Neuhausen (Volkartstraße 22)."},
             "address": {"value": "Volkartstraße 22", "source_text": "Every Friday at Café Kiebitz in Neuhausen (Volkartstraße 22)."},
@@ -286,7 +282,6 @@
             "recurrence_text": {"value": "Every Friday", "source_text": "Every Friday at Café Kiebitz"},
             "start_time": {"flagged": "no start time stated"},
             "price_eur": {"value": 0, "source_text": "No entry fee."},
-            "price_period": {"value": "per_visit", "source_text": "No entry fee."},
             "beginner_friendly": {"value": true, "source_text": "Teaching new players is half the fun."}
           }
         }
@@ -314,7 +309,7 @@
             "language": {"value": "en+de", "source_text": "english + deutsch"},
             "price_eur": {"flagged": "only shoe rental is priced; the entry fee is not stated", "source_text": "shoes for rent 4€ at the desk"},
             "beginner_friendly": {"value": true, "source_text": "beginners welcome, our crew shows you the basics"},
-            "first_timer_info": {"value": "Shoes for rent at the desk (4€).", "source_text": "shoes for rent 4€ at the desk"}
+            "first_timer_info": {"value": "shoes for rent 4€ at the desk", "source_text": "shoes for rent 4€ at the desk"}
           }
         }
       ]
@@ -341,7 +336,6 @@
             "start_time": {"value": "20:00", "source_text": "\"start_time\": \"20:00\""},
             "language": {"value": "en+de", "source_text": "English and German"},
             "price_eur": {"value": 0, "source_text": "free, pay your own drinks"},
-            "price_period": {"value": "per_visit", "source_text": "free, pay your own drinks"},
             "come_alone": {"value": true, "source_text": "yes, about half of the people come alone"},
             "first_timer_info": {"value": "Look for the small flag on the long table at the back.", "source_text": "Look for the small flag on the long table at the back."},
             "organiser_contact": {"value": "hello@stammtisch-maxvorstadt.example", "source_text": "hello@stammtisch-maxvorstadt.example"}
@@ -362,14 +356,13 @@
           "flags": ["stale"],
           "expected_rrule": "FREQ=MONTHLY;BYDAY=2SU",
           "fields": {
+            "first_timer_info": {"value": "Any camera works, phones too.", "source_text": "Any camera works, phones too."},
             "title": {"value": "Munich Photo Walk Club", "source_text": "Munich Photo Walk Club"},
             "place_name": {"value": "Odeonsplatz", "source_text": "Meeting point: Odeonsplatz, at the steps of the Feldherrnhalle."},
-            "category": {"value": "outdoors", "source_text": "We walk and take photos together"},
+            "category": {"value": "outdoors", "source_text": "We walk and take photos together", "also_ok": ["arts_crafts"]},
             "recurrence_text": {"value": "the second Sunday of every month", "source_text": "on the second Sunday of every month at 10:00."},
             "start_time": {"value": "10:00", "source_text": "on the second Sunday of every month at 10:00."},
             "price_eur": {"value": 0, "source_text": "Any camera works, phones too. Free."},
-            "price_period": {"value": "per_visit", "source_text": "Any camera works, phones too. Free."},
-            "beginner_friendly": {"value": true, "source_text": "Any camera works, phones too."},
             "source_updated_at": {"value": "2026-03-14", "source_text": "Last updated: 14 March 2026"}
           }
         }
@@ -418,13 +411,11 @@
             "title": {"value": "Silent Study Sundays", "source_text": "Silent Study Sundays"},
             "place_name": {"value": "Lesesaal Au", "source_text": "in the reading room of the Lesesaal Au (Mariahilfplatz 17)."},
             "address": {"value": "Mariahilfplatz 17", "source_text": "in the reading room of the Lesesaal Au (Mariahilfplatz 17)."},
-            "district": {"value": "Au-Haidhausen", "source_text": "the Lesesaal Au"},
             "category": {"value": "study_cowork", "source_text": "We work quietly on our own stuff"},
             "recurrence_text": {"value": "Every Sunday", "source_text": "Every Sunday from 14:00 to 18:00"},
             "start_time": {"value": "14:00", "source_text": "Every Sunday from 14:00 to 18:00"},
             "end_time": {"value": "18:00", "source_text": "Every Sunday from 14:00 to 18:00"},
             "price_eur": {"value": 0, "source_text": "Students, remote workers, people learning German: all welcome. Free."},
-            "price_period": {"value": "per_visit", "source_text": "Students, remote workers, people learning German: all welcome. Free."},
             "first_timer_info": {"value": "Bring headphones if you like.", "source_text": "Bring headphones if you like."}
           }
         }
@@ -446,7 +437,6 @@
             "title": {"value": "Offener Abend / Open Night", "source_text": "Offener Abend / Open Night"},
             "place_name": {"value": "FabLab Obersendling", "source_text": "FabLab Obersendling, Boschetsrieder Straße 69, 81379 München"},
             "address": {"value": "Boschetsrieder Straße 69", "source_text": "FabLab Obersendling, Boschetsrieder Straße 69, 81379 München"},
-            "district": {"value": "Thalkirchen-Obersendling-Forstenried-Fürstenried-Solln", "source_text": "FabLab Obersendling"},
             "category": {"value": "makerspace", "source_text": "ist unsere Werkstatt für Gäste offen."},
             "recurrence_text": {"value": "Jeden Dienstag", "source_text": "Jeden Dienstag ab 18:00 Uhr"},
             "start_time": {"value": "18:00", "source_text": "Jeden Dienstag ab 18:00 Uhr"},
@@ -479,7 +469,6 @@
             "recurrence_text": {"value": "every last Friday of the month", "source_text": "Jeden letzten Freitag im Monat ab 19 Uhr / every last Friday of the month from 7pm"},
             "start_time": {"value": "19:00", "source_text": "Jeden letzten Freitag im Monat ab 19 Uhr / every last Friday of the month from 7pm"},
             "price_eur": {"value": 10, "source_text": "Unkostenbeitrag 10 € / 10 € to cover materials"},
-            "price_period": {"value": "per_visit", "source_text": "Unkostenbeitrag 10 € / 10 € to cover materials"},
             "come_alone": {"value": true, "source_text": "Ihr könnt gern allein kommen / feel free to come on your own"},
             "first_timer_info": {"value": "Materials provided.", "source_text": "Painting, drawing, collage – materials provided."}
           }
@@ -505,7 +494,6 @@
             "recurrence_text": {"flagged": "'biweekly' can mean twice a week or every two weeks", "source_text": "We play biweekly on Saturdays at 14:00"},
             "start_time": {"value": "14:00", "source_text": "We play biweekly on Saturdays at 14:00"},
             "price_eur": {"value": 0, "source_text": "All levels, we're happy to teach. Free."},
-            "price_period": {"value": "per_visit", "source_text": "All levels, we're happy to teach. Free."},
             "beginner_friendly": {"value": true, "source_text": "All levels, we're happy to teach."},
             "first_timer_info": {"value": "If it rains we move to the café next door.", "source_text": "If it rains we move to the café next door."}
           }
@@ -560,7 +548,6 @@
             "end_time": {"value": "09:30", "source_text": "DTEND;TZID=Europe/Berlin:20261009T093000"},
             "language": {"value": "en", "source_text": "Conversation in English."},
             "price_eur": {"value": 0, "source_text": "Free, you pay your own coffee."},
-            "price_period": {"value": "per_visit", "source_text": "Free, you pay your own coffee."},
             "group_size": {"value": "medium", "source_text": "Small group (around 12 people)"}
           }
         }
@@ -588,7 +575,6 @@
             "start_time": {"value": "14:00", "source_text": "jeden 3. Samstag im Monat von 14 bis 17 Uhr"},
             "end_time": {"value": "17:00", "source_text": "jeden 3. Samstag im Monat von 14 bis 17 Uhr"},
             "price_eur": {"value": 0, "source_text": "Die Teilnahme ist kostenlos,"},
-            "price_period": {"value": "per_visit", "source_text": "Die Teilnahme ist kostenlos,"},
             "first_timer_info": {"value": "Bringt kaputte Toaster, Lampen, Fahrräder oder Kleidung mit", "source_text": "Bringt kaputte Toaster, Lampen, Fahrräder oder Kleidung mit"},
             "organiser_contact": {"value": "info@nachbarschaft-giesing.example", "source_text": "From: Nachbarschaft Giesing <info@nachbarschaft-giesing.example>"}
           }
@@ -640,13 +626,12 @@
           "expected_rrule": "FREQ=WEEKLY;BYDAY=TH",
           "observations": {"uncertain_source": "free i think?"},
           "fields": {
-            "title": {"value": "Film club", "source_text": "there's a film club screening a movie"},
             "place_name": {"value": "Kino im Hinterhof", "source_text": "at Kino im Hinterhof in Au"},
             "district": {"value": "Au-Haidhausen", "source_text": "at Kino im Hinterhof in Au"},
             "category": {"value": "film", "source_text": "a film club screening a movie every thursday"},
             "recurrence_text": {"value": "every thursday", "source_text": "a film club screening a movie every thursday"},
             "start_time": {"flagged": "no start time stated"},
-            "language": {"flagged": "varies between English and German with subtitles", "source_text": "sometimes in english sometimes german with subtitles"},
+            "language": {"value": "en+de", "source_text": "sometimes in english sometimes german with subtitles"},
             "price_eur": {"flagged": "the contributor is unsure", "source_text": "free i think?"},
             "group_size": {"flagged": "a seat count, not a group size", "source_text": "they have like 30 chairs"}
           }
@@ -671,13 +656,12 @@
             "place_name": {"value": "Gemeinschaftsgarten Laim", "source_text": "Ort: Gemeinschaftsgarten Laim, Fürstenrieder Straße 155"},
             "address": {"value": "Fürstenrieder Straße 155", "source_text": "Ort: Gemeinschaftsgarten Laim, Fürstenrieder Straße 155"},
             "district": {"value": "Laim", "source_text": "Ort: Gemeinschaftsgarten Laim, Fürstenrieder Straße 155"},
-            "category": {"value": "outdoors", "source_text": "Mitmachtag im Gemeinschaftsgarten Laim"},
+            "category": {"value": "outdoors", "source_text": "Mitmachtag im Gemeinschaftsgarten Laim", "also_ok": ["volunteering"]},
             "recurrence_text": {"value": "jeden Samstag", "source_text": "Von April bis Oktober jeden Samstag von 10 bis 13 Uhr."},
             "start_time": {"value": "10:00", "source_text": "Von April bis Oktober jeden Samstag von 10 bis 13 Uhr."},
             "end_time": {"value": "13:00", "source_text": "Von April bis Oktober jeden Samstag von 10 bis 13 Uhr."},
             "seasonal_text": {"value": "Von April bis Oktober", "source_text": "Von April bis Oktober jeden Samstag von 10 bis 13 Uhr."},
             "price_eur": {"value": 0, "source_text": "Kostenlos."},
-            "price_period": {"value": "per_visit", "source_text": "Kostenlos."},
             "beginner_friendly": {"value": true, "source_text": "Keine Vorkenntnisse nötig, Handschuhe und Werkzeug sind da."},
             "first_timer_info": {"value": "Handschuhe und Werkzeug sind da.", "source_text": "Keine Vorkenntnisse nötig, Handschuhe und Werkzeug sind da."}
           }
@@ -705,8 +689,7 @@
             "recurrence_text": {"value": "Every Tuesday", "source_text": "Every Tuesday at 19:00 at Café Weißenburg"},
             "start_time": {"value": "19:00", "source_text": "Every Tuesday at 19:00 at Café Weißenburg"},
             "language": {"value": "en+de", "source_text": "Half the evening in English, half in German."},
-            "price_eur": {"value": 0, "source_text": "Free, buy a drink."},
-            "price_period": {"value": "per_visit", "source_text": "Free, buy a drink."}
+            "price_eur": {"value": 0, "source_text": "Free, buy a drink."}
           }
         }
       ]

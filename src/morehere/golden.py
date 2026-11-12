@@ -32,6 +32,9 @@ class GoldenField(_Strict):
     value: Any = None
     source_text: str | None = None
     flagged: str | None = None
+    # Other values that are also right for a judgement call (e.g. a photo walk is
+    # "outdoors" or "arts_crafts"). Scored as correct; never used as the expected draft.
+    also_ok: list[Any] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def _value_xor_flagged(self) -> GoldenField:

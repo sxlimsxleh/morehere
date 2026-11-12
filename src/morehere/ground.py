@@ -161,10 +161,12 @@ def _norm(text: str) -> str:
 # Field checks
 # ---------------------------------------------------------------------------
 
+# Values that must appear word for word in their quote. first_timer_info is here too: it
+# is shown to users as advice, so the model may not paraphrase or add to it (rule 2).
 TEXT_FIELDS = {"title", "place_name", "address", "recurrence_text", "seasonal_text",
-               "organiser_contact"}  # fmt: skip
+               "organiser_contact", "first_timer_info"}  # fmt: skip
 JUDGEMENT_FIELDS = {"category", "language", "come_alone", "beginner_friendly", "group_size",
-                    "price_period", "first_timer_info"}  # fmt: skip
+                    "price_period"}  # fmt: skip
 TIME_FIELDS = {"start_time", "end_time"}
 
 
@@ -175,7 +177,8 @@ class Unsupported(ValueError):
 def _support(name: str, value: Any, span: str, config: CityConfig) -> Any:
     """Return the accepted (typed) value, or raise Unsupported with a reason."""
     if name in TEXT_FIELDS:
-        if not isinstance(value, str) or _norm(value) not in _norm(span):
+        # A full stop added at the end ("Bring your own mat.") doesn't change the words.
+        if not isinstance(value, str) or _norm(value.strip(" .,;:!?")) not in _norm(span):
             raise Unsupported("value does not appear in its source_text")
         return value
     if name in TIME_FIELDS:

@@ -554,3 +554,46 @@ def test_transient_api_errors_fail_one_record_not_the_run(monkeypatch: pytest.Mo
     monkeypatch.setattr(backend, "_create", overloaded)
     with pytest.raises(ExtractionError, match="API unavailable"):
         backend.complete(SETTINGS, "system", "user")
+
+
+# --- Fair scoring -----------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    ("name", "expected", "actual", "same"),
+    [
+        ("recurrence_text", "the second Sunday of every month", "second Sunday of every month",
+         True),
+        ("recurrence_text", "every last Friday of the month", "Jeden letzten Freitag im Monat",
+         True),
+        ("recurrence_text", "every Tuesday", "every Wednesday", False),
+        ("place_name", "Pfarrei St. Wolfgang", "Saal der Pfarrei St. Wolfgang", True),
+        ("place_name", "Odeonsplatz", "Marienplatz", False),
+        ("first_timer_info", "Newcomers get a short tour at 6:30pm.",
+         "Einweisung für Neue um 18:30 Uhr – newcomers get a short tour at 6:30pm.", True),
+        ("title", "Clay and Chat", "clay and chat!", True),
+        ("title", "Clay and Chat", "Clay Night", False),
+        ("category", "outdoors", "arts_crafts", False),
+        ("price_eur", 8, 8.0, True),
+    ],
+)  # fmt: skip
+def test_same_value(name: str, expected: Any, actual: Any, same: bool) -> None:
+    from morehere.evaluation import same_value
+
+    assert same_value(name, expected, actual) is same
+
+
+def test_also_ok_accepts_an_alternative_judgement() -> None:
+    from morehere.evaluation import same_value
+
+    assert same_value("category", "outdoors", "arts_crafts", also_ok=["arts_crafts"])
+
+
+def test_paraphrased_first_timer_tip_is_flagged() -> None:
+    f = gfile("17_biweekly")
+    span = "If it rains we move to the café next door."
+    paraphrase = "Boards provided; if it rains the group moves to the café next door."
+    claims = claims_with(f, first_timer_info=ClaimedField(value=paraphrase, source_text=span))
+    draft = extract(f, FakeBackend(claims)).drafts[0]
+    assert draft.first_timer_info.status == "flagged"
+    assert draft.first_timer_info.reason == "value does not appear in its source_text"

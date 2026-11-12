@@ -145,3 +145,15 @@ One entry per decision: what we chose, what we rejected and why, and where the A
 - **Chose:** each listing is a list of facts `{field, value, source_text, note}`, all strings, with `field` an enum of the 18 names; fields the document doesn't mention are left out ("not stated"). About 1,150 characters instead of 6,898. Allowed values for category, language, price period and group size moved into the prompt; code still rejects anything else while grounding. Two different answers for one field are flagged "conflicting".
 - **Rejected:** dropping structured outputs and validating free-form JSON (no shape guarantee, retries needed), or one call per group of fields (more cost, listings must be stitched together).
 - **Lesson:** I should have tested the schema against the real API with one call before building on it. Tests now pin the schema's size and shape, but only a live call proves the API accepts it.
+
+## M5 · First eval: what the 46 mistakes were
+
+Baseline (claude-opus-5-5, effort medium, 24 documents): field accuracy 90%, 22 wrong values accepted, flags/RRULE/outcomes 100%, $0.47. Of the 46 mistakes:
+
+- **Scoring too strict (~15):** case and punctuation, two phrasings of one schedule, a longer quote of the same place. Fixed in `evaluation.py`: free text compared by words, `recurrence_text` by the RRULE it yields, place names and tips by containment.
+- **My labels were wrong or stricter than the text (~25):** "free" does not state a price *period*; "6-10 people" straddled my own "under 10"; tips the model found that I had missed; districts read from venue names. Labels and conventions updated (golden/labels.json), with `also_ok` for honest judgement calls (photo walk: outdoors or arts_crafts).
+- **Real model errors (~6):** an event page given as the organiser's contact, directions inside place names, a paraphrased first-timer tip, "donation" for free entry. Fixed in the prompt (v2026-11-13.4), and first-timer tips must now be verbatim (rule 2), so a paraphrase is flagged instead of accepted.
+
+On the same recorded responses, the scoring, grounding and label changes alone take field accuracy to 98% and wrong values accepted to 5; the prompt changes need a new live run.
+
+**Lesson:** a hand-labelled set encodes the labeller's conventions. Several "model errors" were conventions I had never written down. Writing them into `conventions` (and the prompt) mattered more than prompt cleverness.

@@ -13,6 +13,7 @@ Metrics, per field and overall:
 from __future__ import annotations
 
 import difflib
+import re
 from collections import defaultdict
 from collections.abc import Callable
 from dataclasses import dataclass, field
@@ -73,6 +74,35 @@ def _norm(value: Any) -> Any:
     if isinstance(value, float | int) and not isinstance(value, bool):
         return round(float(value), 2)
     return value
+
+
+def _words(value: Any) -> str:
+    """Free text without case, punctuation or spacing differences."""
+    return " ".join(re.findall(r"[^\W_]+", str(value).casefold()))
+
+
+# Free-text fields: the same words count as the same answer.
+FREE_TEXT_FIELDS = {"title", "address", "seasonal_text", "organiser_contact"}
+# Verbatim quotes of different length from the same passage: one containing the other is
+# the same answer ("Saal der Pfarrei St. Wolfgang" / "Pfarrei St. Wolfgang").
+CONTAINMENT_FIELDS = {"place_name", "first_timer_info"}
+
+
+def same_value(name: str, expected: Any, actual: Any, also_ok: list[Any] | None = None) -> bool:
+    """Is `actual` the answer the label asks for? Lenient where wording may differ."""
+    if any(same_value(name, alt, actual) for alt in also_ok or []):
+        return True
+    if name == "recurrence_text":
+        # Two phrasings of the same schedule ("the second Sunday of every month" /
+        # "second Sunday of every month", German or English half) are the same answer.
+        rule = parse_recurrence(str(expected)).rrule
+        return rule is not None and rule == parse_recurrence(str(actual)).rrule
+    if name in CONTAINMENT_FIELDS:
+        exp, act = _words(expected), _words(actual)
+        return bool(exp and act) and (exp in act or act in exp)
+    if name in FREE_TEXT_FIELDS:
+        return _words(expected) == _words(actual)
+    return _norm(expected) == _norm(actual)
 
 
 def _similarity(label: GoldenListing, draft: ListingDraft) -> float:
@@ -176,8 +206,10 @@ def _score_pair(
         exp, act = getattr(expected, name), getattr(draft, name)
         counter = report.fields[name]
         counter.total += 1
+        label_field = label.fields.get(name)
+        also_ok = label_field.also_ok if label_field else []
         if exp.status == act.status == "flagged" or (
-            exp.status == act.status == "ok" and _norm(exp.value) == _norm(act.value)
+            exp.status == act.status == "ok" and same_value(name, exp.value, act.value, also_ok)
         ):
             counter.correct += 1
             continue

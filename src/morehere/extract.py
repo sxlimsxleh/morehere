@@ -60,7 +60,7 @@ RECORDINGS_DIR = REPO_ROOT / "evals" / "recordings"
 
 # Bump when the prompt or schema changes: recordings are keyed on it, so stale ones are
 # never replayed against a new prompt.
-PROMPT_VERSION = "2026-11-13.3"
+PROMPT_VERSION = "2026-11-13.4"
 FALLBACK_BETA = "server-side-fallback-2026-07-01"
 
 
@@ -142,11 +142,14 @@ value to "", quote the passage in source_text and explain in note. Otherwise not
 
 Fields:
 - title: the activity's name as written.
-- place_name: the venue or meeting point as written. address: street and house number only, \
-as written (no postcode or city).
-- district: a Munich district or neighbourhood name exactly as written in the document \
-(e.g. "Westend", "Haidhausen", "Schwabing"); the system maps it to an official district. \
-A postcode is not a district.
+- place_name: the name of the venue or meeting point only, as written ("Café Lindwurm", \
+"Odeonsplatz"). Directions such as "at the steps of ..." or "next to ..." are not part of \
+the name; put them in first_timer_info if they help a first visit.
+- address: street and house number only, as written (no postcode or city).
+- district: a Munich district or neighbourhood name exactly as written, only where the \
+document states that the activity is there ("in Neuhausen", "im Westend", an address line \
+ending in "Sendling"); the system maps it to an official district. A venue whose name \
+contains a place name ("Lesesaal Au") does not state a district, and a postcode is not one.
 - category: one of {_choices(get_args(Category))}.
 - recurrence_text: the phrase saying when it repeats, verbatim ("jeden 2. Donnerstag im \
 Monat", "every wed"). For an iCal event use the RRULE value ("FREQ=WEEKLY;BYDAY=TU"). For a \
@@ -157,14 +160,21 @@ one-off event, set value to "", quote the date passage and note "one-off".
 The language of the page itself is not evidence.
 - price_eur: the price for taking part in euros, written as a number ("8", "12.50"); "0" if \
 stated free or donation-based. Costs for extras (shoe rental, drinks) are not the price.
-- price_period: one of {_choices(get_args(PricePeriod))}.
+- price_period: one of {_choices(get_args(PricePeriod))}, only if the document states it \
+("per evening", "pro Abend", "per person", "im Monat", "donation-based"); free entry alone \
+states no period. "donation" only when the price itself is a donation ("donation-based", \
+"auf Spendenbasis"), not when donations are welcome on top of free entry.
 - come_alone: "true" only if the document says people come alone or that coming alone is fine.
 - beginner_friendly: "true" if it says beginners, all levels, no experience needed or similar.
-- group_size: one of {_choices(get_args(GroupSize))}: small is under 10 people, medium 10-30, \
-large over 30; only from a stated number of participants.
-- first_timer_info: a practical tip for a first visit (who to look for, what to bring).
-- organiser_contact: a public contact address or link of the organiser. Never the name or \
-address of a private person who forwarded or wrote the message.
+- group_size: one of {_choices(get_args(GroupSize))}: small is up to 10 people, medium 11-30, \
+large over 30; only from a stated number of participants (a stated maximum such as "max 10 \
+people" counts).
+- first_timer_info: a practical tip for a first visit (who to look for, what to bring, \
+where exactly to meet), copied word for word from one passage: no paraphrase, no combining \
+passages. It is shown to users as advice, so anything not verbatim is discarded.
+- organiser_contact: the organiser's public email address, or their own website or \
+profile. The page of this one event (for example a lu.ma event link) is not a contact. Never \
+the name or address of a private person who forwarded or wrote the message.
 - source_updated_at: a "last updated" date written on the page, as YYYY-MM-DD.
 
 observations (per listing), each with a verbatim source_text:
