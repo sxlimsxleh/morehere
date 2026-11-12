@@ -1,0 +1,17 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//The Crooked Fox//Events//EN
+BEGIN:VEVENT
+UID:pubquiz-weekly@crookedfox.example
+DTSTAMP:20261101T120000Z
+DTSTART;TZID=Europe/Berlin:20260107T200000
+DTEND;TZID=Europe/Berlin:20260107T223000
+RRULE:FREQ=WEEKLY;BYDAY=WE
+EXDATE;TZID=Europe/Berlin:20261223T200000,20261230T200000
+SUMMARY:Pub Quiz in English
+LOCATION:The Crooked Fox, Rosenheimer Straße 152, 81669 München
+DESCRIPTION:Teams of up to 6. Solo players get matched into a team at the door.
+ 5 EUR per person, the winning team gets a bar tab.
+ No quiz on 23 and 30 December.
+END:VEVENT
+END:VCALENDAR

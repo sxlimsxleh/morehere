@@ -1,0 +1,21 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Luma//Calendar//EN
+X-WR-CALNAME:Munich Tandem Collective
+BEGIN:VEVENT
+UID:evt-7Hq2kLmP@lu.ma.example
+DTSTAMP:20261109T081500Z
+DTSTART;TZID=Europe/Berlin:20260908T190000
+DTEND;TZID=Europe/Berlin:20260908T210000
+RRULE:FREQ=WEEKLY;BYDAY=TU
+SUMMARY:Tandem Tuesday – English/German Language Café
+LOCATION:Café Lindwurm, Hohenzollernstraße 41, 80801 München
+DESCRIPTION:Practise German or English over coffee in Schwabing.
+ Entry is free, just order a drink at the bar.
+ Most people come alone, so don't be shy!
+ All levels welcome, from A1 to native.
+ First time? Look for the table with the little flags.
+ Usually 15-25 people.
+URL:https://lu.ma.example/tandem-tuesday
+END:VEVENT
+END:VCALENDAR

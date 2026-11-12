@@ -1,0 +1,64 @@
+# City-specific behaviour for Munich. Code reads this; nothing city-specific is hard-coded.
+
+city: Munich
+country_code: DE
+timezone: Europe/Berlin
+
+# Rough city bounding box (WGS84). Used for the Overpass query in milestone 3.
+bbox:
+  south: 48.0616
+  west: 11.3608
+  north: 48.2482
+  east: 11.7229
+
+# Listings not verified within this many days are hidden (not deleted).
+freshness_days: 60
+
+# The 25 Stadtbezirke. `aliases` are the neighbourhood names people actually use.
+# An alias can point to two districts (e.g. "Giesing"); code must not guess between them.
+districts:
+  - {number: 1, name: Altstadt-Lehel, aliases: [Altstadt, Lehel]}
+  - {number: 2, name: Ludwigsvorstadt-Isarvorstadt, aliases: [Isarvorstadt, Glockenbachviertel, Glockenbach, Gärtnerplatzviertel, Schlachthofviertel, Ludwigsvorstadt]}
+  - {number: 3, name: Maxvorstadt, aliases: [Maxvorstadt, Uni-Viertel]}
+  - {number: 4, name: Schwabing-West, aliases: [Schwabing]}
+  - {number: 5, name: Au-Haidhausen, aliases: [Haidhausen, Au]}
+  - {number: 6, name: Sendling, aliases: [Sendling]}
+  - {number: 7, name: Sendling-Westpark, aliases: [Westpark]}
+  - {number: 8, name: Schwanthalerhöhe, aliases: [Westend, Schwanthalerhöhe]}
+  - {number: 9, name: Neuhausen-Nymphenburg, aliases: [Neuhausen, Nymphenburg]}
+  - {number: 10, name: Moosach, aliases: [Moosach]}
+  - {number: 11, name: Milbertshofen-Am Hart, aliases: [Milbertshofen]}
+  - {number: 12, name: Schwabing-Freimann, aliases: [Schwabing, Freimann]}
+  - {number: 13, name: Bogenhausen, aliases: [Bogenhausen]}
+  - {number: 14, name: Berg am Laim, aliases: [Berg am Laim]}
+  - {number: 15, name: Trudering-Riem, aliases: [Trudering, Riem]}
+  - {number: 16, name: Ramersdorf-Perlach, aliases: [Ramersdorf, Perlach, Neuperlach]}
+  - {number: 17, name: Obergiesing-Fasangarten, aliases: [Giesing, Obergiesing]}
+  - {number: 18, name: Untergiesing-Harlaching, aliases: [Giesing, Untergiesing, Harlaching]}
+  - {number: 19, name: Thalkirchen-Obersendling-Forstenried-Fürstenried-Solln, aliases: [Thalkirchen, Obersendling, Solln]}
+  - {number: 20, name: Hadern, aliases: [Hadern]}
+  - {number: 21, name: Pasing-Obermenzing, aliases: [Pasing, Obermenzing]}
+  - {number: 22, name: Aubing-Lochhausen-Langwied, aliases: [Aubing]}
+  - {number: 23, name: Allach-Untermenzing, aliases: [Allach]}
+  - {number: 24, name: Feldmoching-Hasenbergl, aliases: [Feldmoching, Hasenbergl]}
+  - {number: 25, name: Laim, aliases: [Laim]}
+
+# Regular Score weights (milestone 6). Placeholders; must sum to 1.
+score_weights:
+  recurrence: 0.25
+  newcomer_welcome: 0.25
+  english: 0.15
+  price: 0.15
+  group_size: 0.10
+  distance: 0.10
+
+# OpenStreetMap tags pulled as the places base layer (milestone 3).
+osm_place_tags:
+  - {key: amenity, value: cafe}
+  - {key: amenity, value: library}
+  - {key: amenity, value: community_centre}
+  - {key: amenity, value: arts_centre}
+  - {key: amenity, value: coworking_space}
+  - {key: office, value: coworking}
+  - {key: leisure, value: hackerspace}
+  - {key: sport, value: climbing}
