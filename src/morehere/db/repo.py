@@ -68,6 +68,16 @@ def get_source(session: Session, source_id: str) -> Source | None:
     return Source.model_validate({name: getattr(row, name) for name in Source.model_fields})
 
 
+def list_sources(session: Session, kind: str | None = None) -> list[Source]:
+    stmt = select(SourceRow).order_by(SourceRow.source_id)
+    if kind is not None:
+        stmt = stmt.where(SourceRow.kind == kind)
+    return [
+        Source.model_validate({name: getattr(row, name) for name in Source.model_fields})
+        for row in session.scalars(stmt)
+    ]
+
+
 # ---------------------------------------------------------------------------
 # Raw records
 # ---------------------------------------------------------------------------

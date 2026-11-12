@@ -67,7 +67,9 @@ src/morehere/
   ingest.py                  # fetch -> store RawRecord (hash, dedupe), per-source registry entry
   extract.py                 # Claude tool-use extraction -> ListingDraft
   ground.py                  # grounding check; time/day/price parsing (German + English)
-  recurrence.py              # text/iCal -> RRULE, next occurrences, seasonal breaks
+  recurrence.py              # phrase -> RRULE, seasonal breaks, next occurrences, RRULE -> words,
+                             #   rule inferred from dated events
+  http.py                    # shared client + retry policy (429/5xx, Retry-After) for all sources
   merge.py                   # duplicate detection + merge across sources
   score.py                   # Regular Score (deterministic, weights from config)
   freshness.py               # last_verified, hide stale
@@ -79,6 +81,7 @@ evals/recordings/            # recorded LLM responses so CI runs without an API 
 app/                         # Expo app (later)
 tests/                       # tests/fixtures: hand-built API responses (not real data)
 DECISIONS.md                 # decision, rejected alternative, where the AI got it wrong
+docs/                        # research notes, e.g. docs/ical-sources.md
 ```
 
 ## Data contracts (agreed in M1; ask before changing)
@@ -87,7 +90,7 @@ The source of truth is `src/morehere/models.py`; this is the summary.
 
 - `Evidence`: `source_id`, `raw_record_id`, `source_text` (verbatim), `url | None`, `captured_at`
 - `ExtractedField[T]`: `value: T | None`, `evidence: Evidence | None`, `status: "ok" | "flagged"`, `reason: str | None`. Validated: `ok` needs value + evidence; `flagged` needs a reason and no value.
-- `Source`: `source_id`, `kind` (`osm | ical | submission | email | tip | places_api | web_page`), `name`, `legal_status`, `licence`, `attribution`, `refresh_cron`, `reliability: float`
+- `Source`: `source_id`, `kind` (`osm | ical | submission | email | tip | places_api | web_page`), `name`, `legal_status`, `licence`, `attribution`, `refresh_cron`, `reliability: float`, `url | None` (set for sources we pull, e.g. one per iCal feed)
 - `RawRecord`: `raw_record_id`, `source_id`, `fetched_at`, `sha256` (validated against payload), `content_type`, `url`, `payload`
 - `Place`: `place_id`, `name`, `address`, `district`, `geo` (lat/lon), `osm_id | None`, `kind` (cafe, library, community_centre, …), `osm_tags` (raw OSM map data, not user-facing tags)
 - `Schedule`: `rrule` (no `RRULE:` prefix), `dtstart` (naive local time), `duration_min`, `exdates`, `timezone="Europe/Berlin"`, `breaks: list[ScheduleBreak(label, months)]`
@@ -130,6 +133,8 @@ make lint      # ruff check + format check
 make osm-districts  # OSM Stadtbezirk boundaries (needs overpass-api.de)
 make osm       # OSM places base layer
 make osm-replay  # re-parse the latest stored OSM payload, no network
+make ical      # fetch every iCal feed in the registry
+make ical-probe URL=...  # what does a feed offer? stores nothing
 make evals     # live evals (needs key); make evals-recorded for CI
 make admin     # streamlit curator admin
 make api       # uvicorn API

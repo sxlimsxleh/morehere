@@ -25,12 +25,12 @@ from typing import Any
 
 import httpx
 from sqlalchemy import Engine
-from tenacity import RetryCallState, Retrying, retry_if_exception, stop_after_attempt
-from tenacity import wait_exponential as _wait_exponential
 
+from morehere import http
 from morehere.config import CityConfig, load_city_config
 from morehere.db import repo
 from morehere.db.session import make_engine, session_scope
+from morehere.http import retrying
 from morehere.logging import configure_logging, run_context, timed_step
 from morehere.models import GeoPoint, Place, PlaceKind, RawRecord, sha256_text
 from morehere.text import normalise_whitespace
@@ -40,9 +40,6 @@ log = logging.getLogger("morehere.sources.osm")
 
 SOURCE_ID = "osm-overpass"
 OVERPASS_URL = os.environ.get("OVERPASS_URL", "https://overpass-api.de/api/interpreter")
-# Overpass asks clients to identify themselves; no personal details here.
-USER_AGENT = "morehere/0.1 (Munich third-places scout)"
-RETRY_STATUSES = frozenset({429, 502, 503, 504})
 
 # OSM tags we keep on a Place. Everything else is dropped (decision M3: whitelist).
 KEPT_TAGS = frozenset(
@@ -98,25 +95,6 @@ def build_districts_query(timeout_s: int = 180) -> str:
 # ---------------------------------------------------------------------------
 
 
-def _is_retryable(exc: BaseException) -> bool:
-    if isinstance(exc, httpx.HTTPStatusError):
-        return exc.response.status_code in RETRY_STATUSES
-    return isinstance(exc, httpx.TransportError | OverpassError)
-
-
-_backoff = _wait_exponential(multiplier=2, min=2, max=60)
-
-
-def _wait(retry_state: RetryCallState) -> float:
-    """Honour Retry-After (capped at 2 min) when the server sends one, else back off."""
-    exc = retry_state.outcome.exception() if retry_state.outcome else None
-    if isinstance(exc, httpx.HTTPStatusError):
-        retry_after = exc.response.headers.get("Retry-After", "")
-        if retry_after.isdigit():
-            return min(float(retry_after), 120.0)
-    return _backoff(retry_state)
-
-
 def fetch_overpass(
     client: httpx.Client,
     query: str,
@@ -127,16 +105,12 @@ def fetch_overpass(
 ) -> str:
     """POST a query and return the raw JSON text. Retries 429/5xx, network errors and
     Overpass runtime errors; anything else (e.g. 400 for a bad query) fails at once."""
-    for attempt in Retrying(
-        retry=retry_if_exception(_is_retryable),
-        wait=_wait,
-        stop=stop_after_attempt(max_attempts),
+    for attempt in retrying(
+        log,
+        "osm.fetch.retry",
+        max_attempts=max_attempts,
         sleep=sleep,
-        reraise=True,
-        before_sleep=lambda rs: log.warning(
-            "osm.fetch.retry",
-            extra={"fields": {"attempt": rs.attempt_number, "error": repr(rs.outcome.exception())}},
-        ),
+        extra_retryable=(OverpassError,),
     ):
         with attempt:
             response = client.post(url, data={"data": query})
@@ -149,7 +123,7 @@ def fetch_overpass(
 
 
 def make_client() -> httpx.Client:
-    return httpx.Client(headers={"User-Agent": USER_AGENT}, timeout=httpx.Timeout(200.0))
+    return http.make_client(timeout_s=200.0)
 
 
 def store_payload(engine: Engine, kind: str, payload: str, fetched_at: datetime) -> RawRecord:
