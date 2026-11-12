@@ -73,6 +73,7 @@ class SourceRow(Base):
     attribution: Mapped[str | None] = mapped_column(Text)
     refresh_cron: Mapped[str | None] = mapped_column(Text)
     reliability: Mapped[float] = mapped_column(Float, nullable=False)
+    url: Mapped[str | None] = mapped_column(Text)
     created_at: Mapped[datetime] = _created_at()
     updated_at: Mapped[datetime] = _updated_at()
 

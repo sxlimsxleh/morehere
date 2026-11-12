@@ -138,6 +138,9 @@ class Source(_Strict):
     attribution: str | None = None  # text we must show, e.g. "© OpenStreetMap contributors"
     refresh_cron: str | None = None  # None: not fetched on a schedule (pushed to us)
     reliability: float = Field(ge=0.0, le=1.0)
+    # Where we fetch from, for sources we pull (one iCal feed = one source). None for
+    # source families and for sources that push data to us.
+    url: str | None = None
 
 
 class RawRecord(_Strict):

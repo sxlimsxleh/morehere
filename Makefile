@@ -1,4 +1,4 @@
-.PHONY: setup test test-db lint format db db-down db-reset migrate seed osm osm-districts osm-replay
+.PHONY: setup test test-db lint format db db-down db-reset migrate seed osm osm-districts osm-replay ical ical-probe
 
 setup:
 	uv sync
@@ -47,3 +47,11 @@ osm:
 # Re-parse the latest stored OSM payload; no network.
 osm-replay:
 	uv run python -m morehere.sources.osm replay
+
+# iCal feeds in the source registry (sources with kind=ical and a url)
+ical:
+	uv run python -m morehere.sources.ical ingest
+
+# Check what a feed offers before adding it: make ical-probe URL=https://...
+ical-probe:
+	uv run python -m morehere.sources.ical probe "$(URL)"

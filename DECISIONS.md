@@ -77,6 +77,26 @@ One entry per decision: what we chose, what we rejected and why, and where the A
 - **Chose:** tenacity, up to 4 attempts, exponential backoff, `Retry-After` honoured (capped at 2 min). Overpass sometimes answers 200 with `"remark": "runtime error: Query timed out"`; that counts as a failure and is retried.
 - **Where the AI got it wrong:** the module logger was named `__name__`, which is `"__main__"` under `python -m`, so the CLI's logs bypassed the JSON handler and printed as plain text. Caught on the first real run; loggers are now named explicitly, with a regression test.
 
-## M3 · Real Overpass run not yet done from the cloud session
+## M3 · First real run (12 Nov 2026, from a Codespace)
 
-- overpass-api.de resets the TLS connection from the cloud environment (the proxy allows it; the server refuses), and the overpass.kumi.systems mirror timed out. All behaviour is tested against hand-built fixtures; the first real run happens locally with `make osm-districts && make osm`.
+- overpass-api.de refuses the cloud dev environment, so the first run happened in a GitHub Codespace. Results: all 25 Stadtbezirke matched (none unmatched or missing); 1,413 places (911 cafés, 318 community/arts centres, 118 libraries, 43 coworking, 16 climbing, 7 makerspaces); 33 unnamed skipped; 1,276 inside a district. The 137 without one lie in the bounding box but outside the city; the feed will show Munich only (API milestone). One 502 was retried successfully.
+- OSM is noisy (a Nespresso shop tagged as a café, cafés without addresses). Acceptable: places are the map layer; listings are curated.
+
+## M4 · Recurrence is parsed by rules, not by the LLM
+
+- **Chose:** a small rule-based parser for English and German phrases; anything it can't read with certainty returns no RRULE plus a reason (`ambiguous`, `not_recurring`, `unparsed`) and goes to the curator. All 25 golden phrases produce their expected RRULE.
+- **Rejected:** asking the LLM for the RRULE. Rule 1 (code decides), and a parser can be tested exhaustively.
+- **Decided with Selim:** "jeden zweiten Freitag" / "every second Friday" without "im Monat"/"of the month" means every other week; with it, the 2nd Friday of the month. "Biweekly" stays ambiguous.
+
+## M4 · Real feeds list dates, so series are inferred
+
+- Research (below) showed that public feeds such as Luma's mostly contain one VEVENT per date, not RRULEs. `infer_rrule` finds weekly, every-other-week and nth/last-weekday-monthly series from at least 3 dated events with the same title, place, weekday and local start time, tolerating a skipped week. Irregular groups are left alone.
+- **Rejected:** a lower minimum (2 events). Two dates fit too many rules to be evidence of one.
+
+## M4 · Retry policy moved to `http.py`
+
+- Shared by OSM and iCal (and later sources); OSM only adds its "remark" error as retryable.
+
+## M4 · Occurrences: walk the rule once
+
+- **Where the AI got it wrong:** `next_occurrences` first called `rule.after()` in a loop, which recomputes from dtstart on every call (quadratic); a test with a long walk took 7 s. Now it iterates `rule.xafter()` once, with a cap.
