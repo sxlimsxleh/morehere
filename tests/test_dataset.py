@@ -13,8 +13,7 @@ import pytest
 from pydantic import TypeAdapter
 
 from morehere.config import load_city_config
-from morehere.golden import DEFAULT_RAW_DIR, GoldenFile, GoldenListing, load_golden
-from morehere.models import DRAFT_FIELDS, Evidence, ListingDraft
+from morehere.golden import DEFAULT_RAW_DIR, GoldenFile, GoldenListing, golden_draft, load_golden
 from morehere.text import contains_span
 
 GOLDEN = load_golden()
@@ -24,34 +23,6 @@ LISTING_IDS = [listing.key for _, listing in ALL_LISTINGS]
 
 def raw_text(golden_file: GoldenFile) -> str:
     return (DEFAULT_RAW_DIR / golden_file.file).read_text(encoding="utf-8")
-
-
-def to_draft(golden_file: GoldenFile, listing: GoldenListing) -> ListingDraft:
-    """Build the ListingDraft a perfect extractor would return for this label."""
-    captured_at = datetime.fromisoformat(GOLDEN.as_of)
-    data: dict[str, object] = {
-        "raw_record_id": golden_file.file,
-        "source_id": f"golden-{golden_file.source_kind}",
-        "extracted_at": captured_at,
-        "flags": listing.flags,
-    }
-    for name in DRAFT_FIELDS:
-        label = listing.fields.get(name)
-        evidence = None
-        if label is not None and label.source_text:
-            evidence = Evidence(
-                source_id=f"golden-{golden_file.source_kind}",
-                raw_record_id=golden_file.file,
-                source_text=label.source_text,
-                captured_at=captured_at,
-            )
-        if label is None:
-            data[name] = {"status": "flagged", "reason": "not stated"}
-        elif label.flagged is not None:
-            data[name] = {"status": "flagged", "reason": label.flagged, "evidence": evidence}
-        else:
-            data[name] = {"status": "ok", "value": label.value, "evidence": evidence}
-    return ListingDraft.model_validate(data)
 
 
 # --- Files and labels line up ------------------------------------------------
@@ -93,7 +64,7 @@ def test_every_source_text_occurs_in_its_raw_file(
 def test_every_label_builds_a_valid_listing_draft(
     golden_file: GoldenFile, listing: GoldenListing
 ) -> None:
-    draft = to_draft(golden_file, listing)
+    draft = golden_draft(GOLDEN, golden_file, listing)
     assert draft.flags == listing.flags
 
 

@@ -26,3 +26,33 @@ One entry per decision: what we chose, what we rejected and why, and where the A
 
 - **Chose:** `requires-python = ">=3.12,<3.13"` as a conservative default: mature, and it has the `class Foo[T]` generics syntax used in `models.py`.
 - **Rejected:** 3.13 for now. It would probably work too; revisit once the database and geo libraries are added and we can check them against it.
+
+## M2 · pgvector copied from its official image, not apt-installed
+
+- **Chose:** a multi-stage Dockerfile that copies `vector.so` and its SQL files from `pgvector/pgvector:0.8.0-pg16` into `postgis/postgis:16-3.5`. The build needs no network beyond Docker Hub. Checked: `vector.so` needs glibc ≥ 2.14 and only links libc, so it runs on the PostGIS image's older Debian.
+- **Rejected:** `apt-get install postgresql-16-pgvector` in the PostGIS image. Simpler to read, but needs Debian mirrors at build time, which the cloud dev environment blocks (and CI might too).
+
+## M2 · Schedule stored as JSONB
+
+- **Chose:** `listings.schedule` is JSONB holding a `Schedule`, validated by Pydantic in `repo.py` on the way in and out.
+- **Rejected:** separate columns (rrule, dtstart, ...) or a schedules table. Recurrence is expanded in Python anyway, and breaks/exdates are lists; columns would add joins and buy nothing.
+- **Where the AI got it wrong:** the first version stored a missing schedule as JSON `null`, not SQL `NULL` (SQLAlchemy's default for JSON columns). The CHECK "published needs a schedule" could never fire. A test that bypassed the repo caught it; fixed with `JSONB(none_as_null=True)`.
+
+## M2 · Evidence rows are owned by the link that uses them
+
+- **Chose:** each field-evidence link and each tag inserts its own `evidence` row; saving a listing again deletes the old ones. Simple, and no orphans.
+- **Rejected:** deduplicating identical evidence across links. Saves a few rows, costs reference counting. Revisit if evidence volume matters.
+
+## M2 · Hand-written migrations with a drift test
+
+- **Chose:** `0001_initial_schema.py` written by hand (readable, explainable), plus a test that runs `alembic check` and fails if `tables.py` and the migrations disagree.
+- **Rejected:** committing raw autogenerate output. It works, but it's noisy and easy to merge without reading.
+
+## M2 · Database tests skip locally, fail in CI
+
+- **Chose:** `make test` skips database tests if Postgres is down; `make test-db` (`MOREHERE_REQUIRE_DB=1`) fails instead. Each test runs in a transaction that is rolled back.
+- **Rejected:** testcontainers. One more dependency and slower startup, for what `make db` already gives us.
+
+## M2 · Vector column waits for the search milestone
+
+- **Chose:** enable the `vector` extension now, add the embedding column when we pick the embedding model (its dimension is part of the column type).

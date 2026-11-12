@@ -5,8 +5,12 @@ description = "A scout that helps newcomers to Munich become a regular somewhere
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
 dependencies = [
+    "alembic>=1.13",
+    "geoalchemy2>=0.15",
+    "psycopg[binary]>=3.2",
     "pydantic>=2.9",
     "pyyaml>=6.0",
+    "sqlalchemy>=2.0",
 ]
 
 [dependency-groups]
@@ -32,3 +36,4 @@ select = ["E", "F", "I", "UP", "B"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+markers = ["db: needs Postgres (make db); skipped if unreachable unless MOREHERE_REQUIRE_DB=1"]
