@@ -322,6 +322,10 @@ class Listing(_Strict):
     status: ListingStatus = "draft"
     last_verified_at: datetime | None = None
     source_ids: list[str] = Field(default_factory=list)
+    # Things a curator should look at: merge conflicts, flags, missing facts (milestone 6).
+    review_notes: list[str] = Field(default_factory=list)
+    # Computed by score.py without the user's location (distance is added at query time).
+    regular_score: RegularScore | None = None
 
     @model_validator(mode="after")
     def _publishable(self) -> Listing:
@@ -346,5 +350,6 @@ class RegularScore(_Strict):
     based_on: dict[str, list[str]] = Field(default_factory=dict)
 
 
-# ListingDraft refers to Tag, which is defined after it.
+# ListingDraft refers to Tag and Listing to RegularScore, both defined after them.
 ListingDraft.model_rebuild()
+Listing.model_rebuild()

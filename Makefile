@@ -1,4 +1,4 @@
-.PHONY: setup test test-db lint format db db-down db-reset migrate seed osm osm-districts osm-replay ical ical-probe extract-samples extract evals evals-recorded
+.PHONY: setup test test-db lint format db db-down db-reset migrate seed osm osm-districts osm-replay ical ical-probe extract-samples extract evals evals-recorded promote freshness
 
 setup:
 	uv sync
@@ -73,3 +73,12 @@ evals:
 # Replay recorded responses: no key, no network (CI).
 evals-recorded:
 	uv run python evals/run_evals.py --mode replay $(if $(MODEL),--model $(MODEL)) $(if $(EFFORT),--effort $(EFFORT)) $(if $(TAG),--tag $(TAG))
+
+# --- Listings (milestone 6) -----------------------------------------------------
+# Turn pending drafts into listings: place, merge across sources, tags, Regular Score.
+promote:
+	uv run python -m morehere.promote
+
+# Hide published listings not verified within freshness_days; show re-verified ones.
+freshness:
+	uv run python -m morehere.freshness

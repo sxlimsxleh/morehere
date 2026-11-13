@@ -4,7 +4,7 @@
 
 A scout that helps people new to Munich become a regular somewhere: it finds the recurring groups, work-friendly cafés and community spaces where the same faces show up week after week, and nudges you to keep going back.
 
-**Status:** milestone 5 (extraction) done: Claude reads messy documents into listing drafts, code checks every value against a verbatim quote, and evals score it on 24 hand-labelled Munich documents: 99.6% field accuracy, no wrong values accepted, every flag right (claude-opus-5-5, effort medium, about 1.8 cents a document). Results in `evals/results/`.
+**Status:** milestone 6 (listings) done: drafts become listings at places, duplicates from different sources merge into one, stale listings hide themselves, and every listing has a Regular Score that says what it's based on. Extraction: 99.6% field accuracy on 24 hand-labelled documents (see `evals/results/`).
 
 ## Run it
 
@@ -17,6 +17,7 @@ make osm-districts  # Munich's 25 district boundaries from OpenStreetMap
 make osm       # cafés, libraries, community centres, coworking, makerspaces, climbing
 make ical-probe URL=https://...  # check what a calendar feed offers
 make evals     # score extraction on the golden set (needs ANTHROPIC_API_KEY in .env)
+make extract-samples && make extract && make promote  # samples -> drafts -> listings
 make test      # all tests (database tests skip if Postgres isn't running)
 ```
 

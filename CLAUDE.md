@@ -74,9 +74,11 @@ src/morehere/
   recurrence.py              # phrase -> RRULE, seasonal breaks, next occurrences, RRULE -> words,
                              #   rule inferred from dated events
   http.py                    # shared client + retry policy (429/5xx, Retry-After) for all sources
-  merge.py                   # duplicate detection + merge across sources
-  score.py                   # Regular Score (deterministic, weights from config)
-  freshness.py               # last_verified, hide stale
+  promote.py                 # drafts -> listings: place resolution, schedule, tags, merge, score;
+                             #   pure core promote() + promote_pending() for the database
+  merge.py                   # same_activity() + merge by source reliability, conflicts noted
+  score.py                   # Regular Score (deterministic, weights from config; unknown = 0.5)
+  freshness.py               # hide stale published listings, show re-verified ones
   api/                       # FastAPI app
   logging.py                 # JSON logs: run_context(), timed_step(); loggers named morehere.*
 admin/curate.py              # Streamlit curator queue: approve, fix, merge, verify
@@ -99,7 +101,7 @@ The source of truth is `src/morehere/models.py`; this is the summary.
 - `Place`: `place_id`, `name`, `address`, `district`, `geo` (lat/lon), `osm_id | None`, `kind` (cafe, library, community_centre, …), `osm_tags` (raw OSM map data, not user-facing tags)
 - `Schedule`: `rrule` (no `RRULE:` prefix), `dtstart` (naive local time), `duration_min`, `exdates`, `timezone="Europe/Berlin"`, `breaks: list[ScheduleBreak(label, months)]`
 - `ListingDraft` (what extraction returns from one raw record): `raw_record_id`, `source_id`, `extracted_at`; every content field is an `ExtractedField`: `title`, `place_name`, `address`, `district`, `category`, `recurrence_text`, `start_time`, `end_time`, `seasonal_text`, `language`, `price_eur`, `price_period`, `come_alone`, `beginner_friendly`, `group_size`, `first_timer_info`, `organiser_contact`, `source_updated_at`; plus `tags` and `flags`. The LLM returns `recurrence_text`; code builds the RRULE.
-- `Listing` (a recurring thing at a place, after code and a curator decide): `listing_id`, `title`, `place_id`, `category`, `schedule: Schedule | None`, `language`, `price_eur`, `price_period`, `come_alone`, `beginner_friendly`, `group_size`, `first_timer_info`, `organiser_contact`, `tags`, `field_evidence: dict[field, Evidence]`, `status` (`draft | needs_review | published | hidden`), `last_verified_at`, `source_ids`. Validated: `published` needs an evidenced schedule, `last_verified_at` and a source.
+- `Listing` (a recurring thing at a place, after code and a curator decide): `listing_id`, `title`, `place_id`, `category`, `schedule: Schedule | None`, `language`, `price_eur`, `price_period`, `come_alone`, `beginner_friendly`, `group_size`, `first_timer_info`, `organiser_contact`, `tags`, `field_evidence: dict[field, Evidence]`, `status` (`draft | needs_review | published | hidden`), `last_verified_at`, `source_ids`, `review_notes` (for curators: conflicts, flags, missing facts), `regular_score` (without distance). Validated: `published` needs an evidenced schedule, `last_verified_at` and a source.
 - `Tag`: `name`, `evidence: Evidence` (no evidence, no tag)
 - `RegularScore`: `total: float`, `components: dict[str, float]` (recurrence, newcomer-welcome, English, group size, price, distance), `based_on: dict[component, list[field or tag]]`
 
@@ -143,6 +145,8 @@ make extract-samples  # load data/raw/ into the database as raw records
 make extract   # extract raw records without drafts into the curator queue (needs key)
 make evals     # live evals (needs key), records responses; EFFORT=, MODEL=, TAG= optional
 make evals-recorded  # replay recordings: no key, no network (CI)
+make promote   # pending drafts -> listings (merge, tags, score); never publishes
+make freshness # hide stale published listings, show re-verified ones
 make admin     # streamlit curator admin
 make api       # uvicorn API
 ```

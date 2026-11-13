@@ -1,4 +1,4 @@
-# Extraction eval: claude-opus-5-5, effort medium (replay, run 2ac4c6eec6dd)
+# Extraction eval: claude-opus-5-5, effort medium (replay, run 4c502b3cdbec)
 
 | Overall | |
 | --- | --- |
@@ -7,6 +7,7 @@
 | Recurrence (RRULE) accuracy | 100.0% |
 | Outcome accuracy | 100.0% |
 | Listings expected / extracted / matched | 25 / 25 / 25 |
+| Merge precision / recall | 100.0% / 100.0% (1 / 0 / 0 TP/FP/FN) |
 | Injection listing publishable | no |
 | Failed files | 0 |
 | Tokens in / out / cache read | 5835 / 19535 / 56741 |

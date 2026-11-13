@@ -36,6 +36,7 @@ from morehere.models import (
     ListingDraft,
     Place,
     RawRecord,
+    RegularScore,
     Schedule,
     Source,
     Tag,
@@ -319,6 +320,10 @@ def save_listing(session: Session, listing: Listing) -> None:
     values["last_verified_at"] = (
         _utc(listing.last_verified_at) if listing.last_verified_at else None
     )
+    values["review_notes"] = list(listing.review_notes)
+    score = listing.regular_score
+    values["regular_score"] = score.model_dump(mode="json") if score else None
+    values["score_total"] = score.total if score else None
     stmt = insert(ListingRow).values(listing_id=listing.listing_id, **values)
     stmt = stmt.on_conflict_do_update(
         index_elements=[ListingRow.listing_id],
@@ -406,7 +411,20 @@ def get_listing(session: Session, listing_id: str) -> Listing | None:
         field_evidence=field_evidence,
         tags=tags,
         source_ids=source_ids,
+        review_notes=list(row.review_notes),
+        regular_score=RegularScore.model_validate(row.regular_score) if row.regular_score else None,
     )
+
+
+def list_listings(session: Session, status: str | None = None) -> list[Listing]:
+    stmt = select(ListingRow.listing_id).order_by(ListingRow.listing_id)
+    if status is not None:
+        stmt = stmt.where(ListingRow.status == status)
+    return [listing for lid in session.scalars(stmt) if (listing := get_listing(session, lid))]
+
+
+def list_places(session: Session) -> list[Place]:
+    return [_place_from_mapping(m) for m in session.execute(select(*_place_columns()))]
 
 
 # ---------------------------------------------------------------------------
@@ -442,6 +460,26 @@ def save_draft(session: Session, draft: ListingDraft) -> int:
         )
         .returning(ListingDraftRow.draft_id)
     ).scalar_one()
+
+
+def pending_drafts(session: Session) -> list[tuple[int, ListingDraft]]:
+    """Drafts waiting to be turned into listings, oldest first."""
+    rows = session.execute(
+        select(ListingDraftRow.draft_id, ListingDraftRow.draft)
+        .where(ListingDraftRow.review_status == "pending")
+        .order_by(ListingDraftRow.draft_id)
+    )
+    return [(draft_id, ListingDraft.model_validate(data)) for draft_id, data in rows]
+
+
+def set_draft_review(
+    session: Session, draft_id: int, review_status: str, listing_id: str | None = None
+) -> None:
+    session.execute(
+        update(ListingDraftRow)
+        .where(ListingDraftRow.draft_id == draft_id)
+        .values(review_status=review_status, listing_id=listing_id)
+    )
 
 
 def get_draft(session: Session, draft_id: int) -> ListingDraft | None:

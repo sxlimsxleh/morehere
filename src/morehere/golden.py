@@ -7,7 +7,7 @@ validated here so a typo in a label fails loudly instead of skewing accuracy num
 from __future__ import annotations
 
 import json
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, Literal
 
@@ -89,16 +89,23 @@ def load_golden(path: Path = DEFAULT_LABELS_PATH) -> GoldenSet:
 
 
 def golden_draft(
-    golden: GoldenSet, golden_file: GoldenFile, listing: GoldenListing
+    golden: GoldenSet,
+    golden_file: GoldenFile,
+    listing: GoldenListing,
+    source_id: str | None = None,
+    raw_record_id: str | None = None,
 ) -> ListingDraft:
     """The ListingDraft a perfect extractor would return for this label.
 
     Used by tests (to check labels fit the contracts) and by evals (as the expected value).
+    Pass source_id/raw_record_id to get a draft that fits real database rows: they are set
+    on the draft *and* on every piece of its evidence.
     """
-    captured_at = datetime.fromisoformat(golden.as_of)
-    source_id = f"golden-{golden_file.source_kind}"
+    captured_at = datetime.fromisoformat(golden.as_of).replace(tzinfo=UTC)  # all times are UTC
+    source_id = source_id or f"golden-{golden_file.source_kind}"
+    raw_record_id = raw_record_id or golden_file.file
     data: dict[str, object] = {
-        "raw_record_id": golden_file.file,
+        "raw_record_id": raw_record_id,
         "source_id": source_id,
         "extracted_at": captured_at,
         "flags": listing.flags,
@@ -112,7 +119,7 @@ def golden_draft(
         if label.source_text:
             evidence = Evidence(
                 source_id=source_id,
-                raw_record_id=golden_file.file,
+                raw_record_id=raw_record_id,
                 source_text=label.source_text,
                 captured_at=captured_at,
             )
