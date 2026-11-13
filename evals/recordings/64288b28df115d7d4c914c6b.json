@@ -1,0 +1,14 @@
+{
+  "model": "claude-opus-5-5",
+  "effort": "low",
+  "prompt_version": "2026-11-13.4",
+  "served_by": "claude-opus-5-5",
+  "stop_reason": "end_turn",
+  "usage": {
+    "input_tokens": 107,
+    "output_tokens": 375,
+    "cache_read_input_tokens": 2467,
+    "cache_creation_input_tokens": 0
+  },
+  "text": "{\"listings\":[{\"facts\":[{\"field\":\"title\",\"value\":\"\",\"source_text\":\"there's a film club screening a movie every thursday\",\"note\":\"No name given; described only as a film club.\"},{\"field\":\"place_name\",\"value\":\"Kino im Hinterhof\",\"source_text\":\"Kino im Hinterhof\",\"note\":\"\"},{\"field\":\"district\",\"value\":\"Au\",\"source_text\":\"at Kino im Hinterhof in Au\",\"note\":\"\"},{\"field\":\"category\",\"value\":\"film\",\"source_text\":\"film club screening a movie\",\"note\":\"\"},{\"field\":\"recurrence_text\",\"value\":\"every thursday\",\"source_text\":\"every thursday\",\"note\":\"\"},{\"field\":\"language\",\"value\":\"en+de\",\"source_text\":\"sometimes in english sometimes german with subtitles\",\"note\":\"\"},{\"field\":\"price_eur\",\"value\":\"\",\"source_text\":\"free i think?\",\"note\":\"Hedged; author unsure whether it is free.\"},{\"field\":\"group_size\",\"value\":\"\",\"source_text\":\"they have like 30 chairs\",\"note\":\"Seat count, not a stated number of participants.\"}],\"observations\":[{\"kind\":\"uncertain_source\",\"source_text\":\"free i think?\"}]}],\"injection_spans\":[]}"
+}

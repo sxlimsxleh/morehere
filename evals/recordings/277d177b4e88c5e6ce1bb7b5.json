@@ -1,0 +1,14 @@
+{
+  "model": "claude-opus-5-5",
+  "effort": "medium",
+  "prompt_version": "2026-11-13.4",
+  "served_by": "claude-opus-5-5",
+  "stop_reason": "end_turn",
+  "usage": {
+    "input_tokens": 197,
+    "output_tokens": 854,
+    "cache_read_input_tokens": 2467,
+    "cache_creation_input_tokens": 0
+  },
+  "text": "{\"listings\":[{\"facts\":[{\"field\":\"title\",\"value\":\"Offener Abend\",\"source_text\":\"Offener Abend – FabLab Obersendling\",\"note\":\"\"},{\"field\":\"place_name\",\"value\":\"FabLab Obersendling\",\"source_text\":\"FabLab Obersendling, Boschetsrieder Straße 69, 81379 München\",\"note\":\"\"},{\"field\":\"address\",\"value\":\"Boschetsrieder Straße 69\",\"source_text\":\"FabLab Obersendling, Boschetsrieder Straße 69, 81379 München\",\"note\":\"\"},{\"field\":\"category\",\"value\":\"makerspace\",\"source_text\":\"Jeden Dienstag ab 18:00 Uhr ist unsere Werkstatt für Gäste offen.\",\"note\":\"\"},{\"field\":\"recurrence_text\",\"value\":\"Jeden Dienstag\",\"source_text\":\"Jeden Dienstag ab 18:00 Uhr ist unsere Werkstatt für Gäste offen.\",\"note\":\"\"},{\"field\":\"start_time\",\"value\":\"18:00\",\"source_text\":\"Jeden Dienstag ab 18:00 Uhr ist unsere Werkstatt für Gäste offen.\",\"note\":\"\"},{\"field\":\"price_eur\",\"value\":\"5\",\"source_text\":\"Gäste zahlen 5 € pro Abend.\",\"note\":\"\"},{\"field\":\"price_period\",\"value\":\"per_visit\",\"source_text\":\"Gäste zahlen 5 € pro Abend.\",\"note\":\"\"},{\"field\":\"first_timer_info\",\"value\":\"newcomers get a short tour at 6:30pm.\",\"source_text\":\"Einweisung für Neue um 18:30 Uhr – newcomers get a short tour at 6:30pm.\",\"note\":\"\"}],\"observations\":[]}],\"injection_spans\":[]}"
+}

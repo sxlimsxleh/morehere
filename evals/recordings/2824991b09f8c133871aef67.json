@@ -1,0 +1,14 @@
+{
+  "model": "claude-opus-5-5",
+  "effort": "low",
+  "prompt_version": "2026-11-13.4",
+  "served_by": "claude-opus-5-5",
+  "stop_reason": "end_turn",
+  "usage": {
+    "input_tokens": 277,
+    "output_tokens": 433,
+    "cache_read_input_tokens": 2467,
+    "cache_creation_input_tokens": 0
+  },
+  "text": "{\"listings\":[{\"facts\":[{\"field\":\"title\",\"value\":\"Thursday Knit Club\",\"source_text\":\"the Thursday Knit Club at Café Masche\",\"note\":\"\"},{\"field\":\"place_name\",\"value\":\"Café Masche\",\"source_text\":\"the Thursday Knit Club at Café Masche\",\"note\":\"\"},{\"field\":\"address\",\"value\":\"Pariser Straße 9\",\"source_text\":\"Pariser Straße 9, Haidhausen\",\"note\":\"\"},{\"field\":\"district\",\"value\":\"Haidhausen\",\"source_text\":\"Pariser Straße 9, Haidhausen\",\"note\":\"\"},{\"field\":\"category\",\"value\":\"arts_crafts\",\"source_text\":\"Thursday Knit Club\",\"note\":\"\"},{\"field\":\"recurrence_text\",\"value\":\"every Thursday\",\"source_text\":\"We used to meet every Thursday at 18:00.\",\"note\":\"\"},{\"field\":\"start_time\",\"value\":\"18:00\",\"source_text\":\"We used to meet every Thursday at 18:00.\",\"note\":\"\"},{\"field\":\"organiser_contact\",\"value\":\"knitclub@mail.example\",\"source_text\":\"From: Thursday Knit Club <knitclub@mail.example>\",\"note\":\"\"}],\"observations\":[{\"kind\":\"cancelled\",\"source_text\":\"is cancelled until further notice. The café is closing for renovation and we\"}]}],\"injection_spans\":[]}"
+}

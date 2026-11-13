@@ -1,0 +1,14 @@
+{
+  "model": "claude-opus-5-5",
+  "effort": "low",
+  "prompt_version": "2026-11-13.4",
+  "served_by": "claude-opus-5-5",
+  "stop_reason": "end_turn",
+  "usage": {
+    "input_tokens": 196,
+    "output_tokens": 580,
+    "cache_read_input_tokens": 2467,
+    "cache_creation_input_tokens": 0
+  },
+  "text": "{\"listings\":[{\"facts\":[{\"field\":\"title\",\"value\":\"Munich Book Swap & Chat\",\"source_text\":\"Munich Book Swap & Chat\",\"note\":\"\"},{\"field\":\"recurrence_text\",\"value\":\"every first Monday of the month\",\"source_text\":\"every first Monday of the month\",\"note\":\"\"},{\"field\":\"start_time\",\"value\":\"19:30\",\"source_text\":\"7:30pm to 9:30pm\",\"note\":\"\"},{\"field\":\"end_time\",\"value\":\"21:30\",\"source_text\":\"7:30pm to 9:30pm\",\"note\":\"\"},{\"field\":\"place_name\",\"value\":\"Bücher-Café Seitenwind\",\"source_text\":\"Bücher-Café Seitenwind\",\"note\":\"\"},{\"field\":\"address\",\"value\":\"Lindwurmstraße 128\",\"source_text\":\"Lindwurmstraße 128\",\"note\":\"\"},{\"field\":\"district\",\"value\":\"Sendling\",\"source_text\":\"Lindwurmstraße 128, Sendling\",\"note\":\"\"},{\"field\":\"category\",\"value\":\"social\",\"source_text\":\"Bring a book, take a book, stay for a chat.\",\"note\":\"\"},{\"field\":\"language\",\"value\":\"en\",\"source_text\":\"Conversation is in English.\",\"note\":\"\"},{\"field\":\"price_eur\",\"value\":\"0\",\"source_text\":\"Free, but please bring at least one book to swap.\",\"note\":\"\"},{\"field\":\"first_timer_info\",\"value\":\"Free, but please bring at least one book to swap.\",\"source_text\":\"Free, but please bring at least one book to swap.\",\"note\":\"\"},{\"field\":\"group_size\",\"value\":\"small\",\"source_text\":\"We're a small group of 6-10 people\",\"note\":\"\"},{\"field\":\"organiser_contact\",\"value\":\"bookswap.munich@mail.example\",\"source_text\":\"bookswap.munich@mail.example\",\"note\":\"\"}],\"observations\":[]}],\"injection_spans\":[]}"
+}

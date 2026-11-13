@@ -1,0 +1,14 @@
+{
+  "model": "claude-opus-5-5",
+  "effort": "low",
+  "prompt_version": "2026-11-13.4",
+  "served_by": "claude-opus-5-5",
+  "stop_reason": "end_turn",
+  "usage": {
+    "input_tokens": 414,
+    "output_tokens": 716,
+    "cache_read_input_tokens": 2467,
+    "cache_creation_input_tokens": 0
+  },
+  "text": "{\"listings\":[{\"facts\":[{\"field\":\"title\",\"value\":\"Repair Café\",\"source_text\":\"unser Repair Café findet weiterhin jeden 3. Samstag im Monat von 14 bis 17 Uhr\",\"note\":\"\"},{\"field\":\"place_name\",\"value\":\"Stadtteilladen Giesing\",\"source_text\":\"im Stadtteilladen Giesing (Silberhornstraße 4) statt.\",\"note\":\"\"},{\"field\":\"address\",\"value\":\"Silberhornstraße 4\",\"source_text\":\"im Stadtteilladen Giesing (Silberhornstraße 4) statt.\",\"note\":\"\"},{\"field\":\"category\",\"value\":\"makerspace\",\"source_text\":\"unser Repair Café findet weiterhin jeden 3. Samstag im Monat von 14 bis 17 Uhr\",\"note\":\"\"},{\"field\":\"recurrence_text\",\"value\":\"jeden 3. Samstag im Monat\",\"source_text\":\"unser Repair Café findet weiterhin jeden 3. Samstag im Monat von 14 bis 17 Uhr\",\"note\":\"\"},{\"field\":\"start_time\",\"value\":\"14:00\",\"source_text\":\"unser Repair Café findet weiterhin jeden 3. Samstag im Monat von 14 bis 17 Uhr\",\"note\":\"\"},{\"field\":\"end_time\",\"value\":\"17:00\",\"source_text\":\"unser Repair Café findet weiterhin jeden 3. Samstag im Monat von 14 bis 17 Uhr\",\"note\":\"\"},{\"field\":\"price_eur\",\"value\":\"0\",\"source_text\":\"Die Teilnahme ist kostenlos,\",\"note\":\"\"},{\"field\":\"first_timer_info\",\"value\":\"Bringt kaputte Toaster, Lampen, Fahrräder oder Kleidung mit – unsere\",\"source_text\":\"Bringt kaputte Toaster, Lampen, Fahrräder oder Kleidung mit – unsere\",\"note\":\"\"},{\"field\":\"organiser_contact\",\"value\":\"info@nachbarschaft-giesing.example\",\"source_text\":\"From: Nachbarschaft Giesing <info@nachbarschaft-giesing.example>\",\"note\":\"\"}],\"observations\":[]}],\"injection_spans\":[]}"
+}

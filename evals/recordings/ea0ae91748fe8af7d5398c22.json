@@ -1,0 +1,14 @@
+{
+  "model": "claude-opus-5-5",
+  "effort": "low",
+  "prompt_version": "2026-11-13.4",
+  "served_by": "claude-opus-5-5",
+  "stop_reason": "end_turn",
+  "usage": {
+    "input_tokens": 194,
+    "output_tokens": 536,
+    "cache_read_input_tokens": 2467,
+    "cache_creation_input_tokens": 0
+  },
+  "text": "{\"listings\":[{\"facts\":[{\"field\":\"title\",\"value\":\"Clay and Chat\",\"source_text\":\"Clay and Chat\",\"note\":\"\"},{\"field\":\"place_name\",\"value\":\"Tonwerk Giesing\",\"source_text\":\"at Tonwerk Giesing\",\"note\":\"\"},{\"field\":\"address\",\"value\":\"Tegernseer Landstraße 75\",\"source_text\":\"Tegernseer Landstraße 75\",\"note\":\"\"},{\"field\":\"category\",\"value\":\"arts_crafts\",\"source_text\":\"Clay and Chat\",\"note\":\"\"},{\"field\":\"recurrence_text\",\"value\":\"Every Thursday\",\"source_text\":\"Every Thursday\",\"note\":\"\"},{\"field\":\"start_time\",\"value\":\"18:30\",\"source_text\":\"18:30 to 21:00\",\"note\":\"\"},{\"field\":\"end_time\",\"value\":\"21:00\",\"source_text\":\"18:30 to 21:00\",\"note\":\"\"},{\"field\":\"price_eur\",\"value\":\"8\",\"source_text\":\"8 € per evening\",\"note\":\"\"},{\"field\":\"price_period\",\"value\":\"per_visit\",\"source_text\":\"8 € per evening\",\"note\":\"\"},{\"field\":\"beginner_friendly\",\"value\":\"true\",\"source_text\":\"Beginners welcome\",\"note\":\"\"},{\"field\":\"group_size\",\"value\":\"small\",\"source_text\":\"Max 10 people per evening\",\"note\":\"\"},{\"field\":\"first_timer_info\",\"value\":\"Wear clothes that can get dirty.\",\"source_text\":\"Wear clothes that can get dirty.\",\"note\":\"\"},{\"field\":\"organiser_contact\",\"value\":\"hello@tonwerk.example\",\"source_text\":\"please register by email: hello@tonwerk.example\",\"note\":\"\"}],\"observations\":[]}],\"injection_spans\":[]}"
+}

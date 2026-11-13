@@ -157,3 +157,17 @@ Baseline (claude-opus-5-5, effort medium, 24 documents): field accuracy 90%, 22 
 On the same recorded responses, the scoring, grounding and label changes alone take field accuracy to 98% and wrong values accepted to 5; the prompt changes need a new live run.
 
 **Lesson:** a hand-labelled set encodes the labeller's conventions. Several "model errors" were conventions I had never written down. Writing them into `conventions` (and the prompt) mattered more than prompt cleverness.
+
+## M5 · Results with prompt v4, and the effort choice
+
+| Run (claude-opus-5-5, 24 documents) | Field accuracy | Wrong values accepted | Flags, RRULE, outcomes | Cost | Model time |
+| --- | --- | --- | --- | --- | --- |
+| Baseline, old prompt and labels | 90% | 22 | 100% | $0.47 | 183 s |
+| v4, medium effort (re-scored) | 99.6% | 0 | 100% | $0.44 | 173 s |
+| v4, low effort (re-scored) | 99.0% | 3 | 100% | $0.28 | 130 s, 2 documents failed (503) |
+
+- **Prompt v4 fixed what it targeted:** no event pages as contacts, no directions inside place names, price period only when stated, group sizes right; place_name, price_period and group_size went to 100%.
+- **After the v4 run, labels changed only where** the document supports the model (the Lantern Walk is run by the newsletter team, so its email is a contact; `blockwerk.muc` is the venue's own profile), where my labels broke my own new district convention (four names like "Offener Chor Haidhausen" are not location statements), or where a document has several valid first-timer tips (`also_ok`). Two judgement calls were left as they are (FabLab "beginner-friendly", board-game "language"); in both the model flags instead of guessing.
+- **Chose effort `medium`** (already the default in `config/llm.yaml`). Low is ~36% cheaper (about 1.2 vs 1.8 cents a document) but accepted 3 wrong values on judgement fields (beginner-friendly from "nobody judges", a newsletter's email as an organiser's contact). At our volume the difference is cents; wrong values reach users.
+- **Also:** the SDK now retries 4 times (low lost 2 documents to "grammar compilation temporarily unavailable"), and reports show one decimal (99.56% had been displayed as "100%").
+- **Caveat, honestly:** labels were revised after seeing model output, on only 24 documents, so 99.6% is an optimistic number. The real test is new documents the labels have never been tuned on: the listings curated in milestone 7 will become a held-out set.

@@ -1,0 +1,14 @@
+{
+  "model": "claude-opus-5-5",
+  "effort": "medium",
+  "prompt_version": "2026-11-13.4",
+  "served_by": "claude-opus-5-5",
+  "stop_reason": "end_turn",
+  "usage": {
+    "input_tokens": 216,
+    "output_tokens": 875,
+    "cache_read_input_tokens": 2467,
+    "cache_creation_input_tokens": 0
+  },
+  "text": "{\"listings\":[{\"facts\":[{\"field\":\"title\",\"value\":\"Mitmachtag im Gemeinschaftsgarten Laim\",\"source_text\":\"Mitmachtag im Gemeinschaftsgarten Laim\",\"note\":\"\"},{\"field\":\"place_name\",\"value\":\"Gemeinschaftsgarten Laim\",\"source_text\":\"Ort: Gemeinschaftsgarten Laim\",\"note\":\"\"},{\"field\":\"address\",\"value\":\"Fürstenrieder Straße 155\",\"source_text\":\"Fürstenrieder Straße 155\",\"note\":\"\"},{\"field\":\"category\",\"value\":\"outdoors\",\"source_text\":\"Mitmachtag im Gemeinschaftsgarten Laim\",\"note\":\"\"},{\"field\":\"recurrence_text\",\"value\":\"jeden Samstag\",\"source_text\":\"jeden Samstag\",\"note\":\"\"},{\"field\":\"seasonal_text\",\"value\":\"Von April bis Oktober\",\"source_text\":\"Von April bis Oktober\",\"note\":\"\"},{\"field\":\"start_time\",\"value\":\"10:00\",\"source_text\":\"von 10 bis 13 Uhr\",\"note\":\"\"},{\"field\":\"end_time\",\"value\":\"13:00\",\"source_text\":\"von 10 bis 13 Uhr\",\"note\":\"\"},{\"field\":\"price_eur\",\"value\":\"0\",\"source_text\":\"Kostenlos.\",\"note\":\"\"},{\"field\":\"beginner_friendly\",\"value\":\"true\",\"source_text\":\"Keine Vorkenntnisse nötig\",\"note\":\"\"},{\"field\":\"first_timer_info\",\"value\":\"Handschuhe und Werkzeug sind da.\",\"source_text\":\"Handschuhe und Werkzeug sind da.\",\"note\":\"\"}],\"observations\":[]}],\"injection_spans\":[]}"
+}

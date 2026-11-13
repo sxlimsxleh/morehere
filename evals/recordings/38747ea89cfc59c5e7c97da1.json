@@ -1,0 +1,14 @@
+{
+  "model": "claude-opus-5-5",
+  "effort": "low",
+  "prompt_version": "2026-11-13.4",
+  "served_by": "claude-opus-5-5",
+  "stop_reason": "end_turn",
+  "usage": {
+    "input_tokens": 200,
+    "output_tokens": 474,
+    "cache_read_input_tokens": 2467,
+    "cache_creation_input_tokens": 0
+  },
+  "text": "{\"listings\":[{\"facts\":[{\"field\":\"title\",\"value\":\"ISAR MORNING RUNNERS\",\"source_text\":\"ISAR MORNING RUNNERS\",\"note\":\"\"},{\"field\":\"place_name\",\"value\":\"Wittelsbacherbrücke\",\"source_text\":\"we meet at the Wittelsbacherbrücke\",\"note\":\"\"},{\"field\":\"district\",\"value\":\"Isarvorstadt\",\"source_text\":\"Isarvorstadt side\",\"note\":\"\"},{\"field\":\"category\",\"value\":\"running\",\"source_text\":\"Two groups: 5 km easy and 8 km steady.\",\"note\":\"\"},{\"field\":\"recurrence_text\",\"value\":\"Every Saturday\",\"source_text\":\"Every Saturday at 9:00\",\"note\":\"\"},{\"field\":\"start_time\",\"value\":\"09:00\",\"source_text\":\"Every Saturday at 9:00\",\"note\":\"\"},{\"field\":\"language\",\"value\":\"en+de\",\"source_text\":\"We chat in English and German.\",\"note\":\"\"},{\"field\":\"price_eur\",\"value\":\"0\",\"source_text\":\"It's free and there's nothing to sign up for, just show up.\",\"note\":\"\"},{\"field\":\"beginner_friendly\",\"value\":\"true\",\"source_text\":\"All paces, nobody gets left behind.\",\"note\":\"\"},{\"field\":\"first_timer_info\",\"value\":\"New? Say hi to whoever is holding the orange flag.\",\"source_text\":\"New? Say hi to whoever is holding the orange flag.\",\"note\":\"\"}],\"observations\":[]}],\"injection_spans\":[]}"
+}

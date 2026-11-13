@@ -1,0 +1,156 @@
+{
+  "field_accuracy": 0.9688888888888889,
+  "fields": {
+    "title": {
+      "correct": 23,
+      "total": 25
+    },
+    "place_name": {
+      "correct": 25,
+      "total": 25
+    },
+    "address": {
+      "correct": 25,
+      "total": 25
+    },
+    "district": {
+      "correct": 21,
+      "total": 25
+    },
+    "category": {
+      "correct": 25,
+      "total": 25
+    },
+    "recurrence_text": {
+      "correct": 25,
+      "total": 25
+    },
+    "start_time": {
+      "correct": 25,
+      "total": 25
+    },
+    "end_time": {
+      "correct": 25,
+      "total": 25
+    },
+    "seasonal_text": {
+      "correct": 25,
+      "total": 25
+    },
+    "language": {
+      "correct": 24,
+      "total": 25
+    },
+    "price_eur": {
+      "correct": 25,
+      "total": 25
+    },
+    "price_period": {
+      "correct": 25,
+      "total": 25
+    },
+    "come_alone": {
+      "correct": 25,
+      "total": 25
+    },
+    "beginner_friendly": {
+      "correct": 24,
+      "total": 25
+    },
+    "group_size": {
+      "correct": 25,
+      "total": 25
+    },
+    "first_timer_info": {
+      "correct": 21,
+      "total": 25
+    },
+    "organiser_contact": {
+      "correct": 23,
+      "total": 25
+    },
+    "source_updated_at": {
+      "correct": 25,
+      "total": 25
+    }
+  },
+  "wrong_accepted": {
+    "organiser_contact": 2,
+    "first_timer_info": 4,
+    "title": 2
+  },
+  "flags": {
+    "suspected_injection": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    "not_recurring": {
+      "tp": 2,
+      "fp": 0,
+      "fn": 0
+    },
+    "cancelled": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    "stale": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    "missing_time": {
+      "tp": 2,
+      "fp": 0,
+      "fn": 0
+    },
+    "ambiguous_recurrence": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    "uncertain_source": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    }
+  },
+  "recurrence": {
+    "correct": 25,
+    "total": 25
+  },
+  "outcomes": {
+    "correct": 25,
+    "total": 25
+  },
+  "expected_listings": 25,
+  "extracted_listings": 25,
+  "matched_listings": 25,
+  "injection_listing_publishable": false,
+  "failed_files": [],
+  "usage": {
+    "input_tokens": 5835,
+    "output_tokens": 19535,
+    "cache_read_input_tokens": 56741,
+    "cache_creation_input_tokens": 2467
+  },
+  "est_cost_usd": 0.43771400000000005,
+  "duration_ms": 172987,
+  "mistakes": [
+    "lantern-walk.organiser_contact: expected 'flagged', got 'hello@newcomers-weekly.example'",
+    "brettspielabend-westend.language: expected 'de', got 'flagged (Mostly German; English explanations often available, so the language is not clearly de or en+de.)'",
+    "chor-haidhausen.district: expected 'Au-Haidhausen', got 'flagged (not stated)'",
+    "christmas-market-meetup.first_timer_info: expected 'flagged', got 'Meeting point: in front of the Chinesischer Turm, Englischer Garten'",
+    "wuerfel-und-worte.title: expected 'Würfel & Worte', got 'Würfel & Worte – board-game night'",
+    "new-faces-wednesday.first_timer_info: expected 'shoes for rent 4€ at the desk', got 'we meet at the big wall'",
+    "new-faces-wednesday.organiser_contact: expected 'flagged', got 'blockwerk.muc'",
+    "stammtisch-maxvorstadt.district: expected 'Maxvorstadt', got 'flagged (not stated)'",
+    "photo-walk-club.first_timer_info: expected 'Any camera works, phones too.', got 'Meeting point: Odeonsplatz, at the steps of the Feldherrnhalle.'",
+    "fablab-open-night.title: expected 'Offener Abend / Open Night', got 'Offener Abend'",
+    "fablab-open-night.beginner_friendly: expected True, got 'flagged (not stated)'",
+    "chess-in-the-park.first_timer_info: expected 'If it rains we move to the café next door.', got 'near the fountain'",
+    "garten-laim.district: expected 'Laim', got 'flagged (not stated)'",
+    "language-cafe-haidhausen.district: expected 'Au-Haidhausen', got 'flagged (not stated)'"
+  ]
+}

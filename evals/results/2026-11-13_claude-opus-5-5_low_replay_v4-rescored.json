@@ -1,0 +1,148 @@
+{
+  "field_accuracy": 0.9903381642512077,
+  "fields": {
+    "title": {
+      "correct": 23,
+      "total": 23
+    },
+    "place_name": {
+      "correct": 23,
+      "total": 23
+    },
+    "address": {
+      "correct": 23,
+      "total": 23
+    },
+    "district": {
+      "correct": 23,
+      "total": 23
+    },
+    "category": {
+      "correct": 23,
+      "total": 23
+    },
+    "recurrence_text": {
+      "correct": 23,
+      "total": 23
+    },
+    "start_time": {
+      "correct": 23,
+      "total": 23
+    },
+    "end_time": {
+      "correct": 23,
+      "total": 23
+    },
+    "seasonal_text": {
+      "correct": 23,
+      "total": 23
+    },
+    "language": {
+      "correct": 22,
+      "total": 23
+    },
+    "price_eur": {
+      "correct": 23,
+      "total": 23
+    },
+    "price_period": {
+      "correct": 23,
+      "total": 23
+    },
+    "come_alone": {
+      "correct": 23,
+      "total": 23
+    },
+    "beginner_friendly": {
+      "correct": 21,
+      "total": 23
+    },
+    "group_size": {
+      "correct": 23,
+      "total": 23
+    },
+    "first_timer_info": {
+      "correct": 23,
+      "total": 23
+    },
+    "organiser_contact": {
+      "correct": 22,
+      "total": 23
+    },
+    "source_updated_at": {
+      "correct": 23,
+      "total": 23
+    }
+  },
+  "wrong_accepted": {
+    "beginner_friendly": 2,
+    "organiser_contact": 1
+  },
+  "flags": {
+    "suspected_injection": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    "not_recurring": {
+      "tp": 2,
+      "fp": 0,
+      "fn": 0
+    },
+    "cancelled": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    "stale": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    "missing_time": {
+      "tp": 2,
+      "fp": 0,
+      "fn": 0
+    },
+    "ambiguous_recurrence": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    "uncertain_source": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    }
+  },
+  "recurrence": {
+    "correct": 23,
+    "total": 23
+  },
+  "outcomes": {
+    "correct": 23,
+    "total": 23
+  },
+  "expected_listings": 25,
+  "extracted_listings": 23,
+  "matched_listings": 23,
+  "injection_listing_publishable": false,
+  "failed_files": [
+    "15_makerspace_open_night.html: no recording for this document with claude-opus-5-5/low and prompt 2026-11-13.4; run `make evals` with a key to record it",
+    "24_language_cafe_haidhausen.txt: no recording for this document with claude-opus-5-5/low and prompt 2026-11-13.4; run `make evals` with a key to record it"
+  ],
+  "usage": {
+    "input_tokens": 5499,
+    "output_tokens": 12429,
+    "cache_read_input_tokens": 54274,
+    "cache_creation_input_tokens": 0
+  },
+  "est_cost_usd": 0.28142199999999995,
+  "duration_ms": 0,
+  "mistakes": [
+    "tandem-tuesday-newsletter.beginner_friendly: expected 'flagged', got True",
+    "tandem-tuesday-newsletter.organiser_contact: expected 'flagged', got 'hello@newcomers-weekly.example'",
+    "brettspielabend-westend.language: expected 'de', got 'flagged (Mostly German; English explanations often available.)'",
+    "photo-walk-club.beginner_friendly: expected 'flagged', got True"
+  ]
+}
