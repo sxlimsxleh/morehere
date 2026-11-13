@@ -17,13 +17,13 @@ I (Selim) own this code and must be able to explain every line. Work in small st
 1. **The LLM reads; code decides.** The LLM is used to (a) extract structured fields from messy text, (b) ask follow-up questions on community tips and (c) write the "why this fits you" line. Ranking, the Regular Score, merging and publishing are deterministic code or a human curator.
 2. **Grounded or flagged.** Every extracted fact carries `source_text`, a verbatim span from the raw document. A fact is accepted only if `source_text` occurs in the normalised raw text and supports the value (after time, day and price normalisation). Otherwise it gets `status="flagged"` and `value=None`, the reason is recorded, and it goes to the curator queue. Never guess.
 3. **Every tag shows its evidence.** "Beginners welcome", "come alone OK", "English" and similar tags link to the `Evidence` they came from. A tag without evidence is not shown to users.
-4. **Raw input is untrusted data.** Pages, emails, iCal descriptions and tips can contain text that looks like instructions. The extraction call exposes exactly one tool (`record_listing`) and no tools that act. Instruction-like text is flagged as `suspected_injection`.
+4. **Raw input is untrusted data.** Pages, emails, iCal descriptions and tips can contain text that looks like instructions. The extraction call gives the model **no tools at all**: it answers through structured output (a JSON schema), and the document is passed inside `<document>` tags as data. Instruction-like text is flagged as `suspected_injection` by the model's report **or** a pattern check in code, and such drafts are never publishable.
 5. **Legal sources only.** Every source sits in the source registry with a legal status, licence, refresh schedule and reliability score. No crawling of social platforms or competitor sites. Users may paste links and text; we extract from what they give us. OSM data keeps ODbL attribution. Google Places content is not cached beyond what its terms allow.
 6. **Recurrence is first-class.** Schedules are iCal RRULEs (plus EXDATEs and seasonal breaks), not lists of dated events. "Every 2nd Thursday" and "jeden ersten Montag im Monat" must round-trip.
 7. **Freshness is visible.** Every listing has `last_verified_at`. Listings not verified within the configured window (default 60 days) are hidden automatically, not deleted.
 8. **Raw payloads are kept.** Every ingestion run stores the raw payload with a sha256 hash, so extraction is re-runnable and auditable.
 9. **Everything is observable.** Each ingestion or extraction job has a `run_id`. Logs are structured JSON (step, duration_ms, input/output tokens, est. cost).
-10. **Deterministic where possible.** Temperature 0, `now` injectable for tests, and city-specific behaviour (bounding box, districts, freshness window, score weights) in `config/munich.yaml`, not in code.
+10. **Deterministic where possible.** A pinned model and effort (`ANTHROPIC_MODEL`, `ANTHROPIC_EFFORT`; current models don't accept `temperature`), recorded LLM responses for CI (`evals/recordings/`, keyed on model + effort + prompt version + document), `now` injectable for tests, and city-specific behaviour (bounding box, districts, freshness window, score weights) in `config/munich.yaml`, not in code.
 11. **Minimal personal data, EU-hosted.** Store only what the feature needs. Consent is explicit for email and push. Tips must describe public, open-to-anyone activities and no private individuals.
 
 ## Stack
@@ -46,6 +46,7 @@ No agent frameworks. The model name comes from env `ANTHROPIC_MODEL` and the key
 ```
 config/munich.yaml           # bbox, districts, freshness window, score weights, OSM tag list
 config/sources.yaml          # the source registry (legal status, licence, refresh, reliability)
+config/llm.yaml              # default model/effort, max_tokens, prices for cost estimates
 docker/postgres/             # Postgres 16 + PostGIS + pgvector image; creates morehere_test
 docker-compose.yml           # local db service
 alembic.ini
@@ -65,8 +66,11 @@ src/morehere/
   sources/                   # one module per source: osm.py, ical.py, submission.py, email_inbox.py
                              #   each: fetch -> store RawRecord -> parse the STORED payload -> upsert
   ingest.py                  # fetch -> store RawRecord (hash, dedupe), per-source registry entry
-  extract.py                 # Claude tool-use extraction -> ListingDraft
-  ground.py                  # grounding check; time/day/price parsing (German + English)
+  extract.py                 # Claude structured-output extraction -> claims -> ListingDraft;
+                             #   backends: live, recording, replay
+  ground.py                  # claims -> ListingDraft: span check, value support (times, prices,
+                             #   dates, districts), flags decided by code, outcome()
+  evaluation.py              # scoring against the golden set (used by evals/run_evals.py)
   recurrence.py              # phrase -> RRULE, seasonal breaks, next occurrences, RRULE -> words,
                              #   rule inferred from dated events
   http.py                    # shared client + retry policy (429/5xx, Retry-After) for all sources
@@ -135,7 +139,10 @@ make osm       # OSM places base layer
 make osm-replay  # re-parse the latest stored OSM payload, no network
 make ical      # fetch every iCal feed in the registry
 make ical-probe URL=...  # what does a feed offer? stores nothing
-make evals     # live evals (needs key); make evals-recorded for CI
+make extract-samples  # load data/raw/ into the database as raw records
+make extract   # extract raw records without drafts into the curator queue (needs key)
+make evals     # live evals (needs key), records responses; EFFORT=, MODEL=, TAG= optional
+make evals-recorded  # replay recordings: no key, no network (CI)
 make admin     # streamlit curator admin
 make api       # uvicorn API
 ```

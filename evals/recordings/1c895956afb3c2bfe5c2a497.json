@@ -1,0 +1,14 @@
+{
+  "model": "claude-opus-5-5",
+  "effort": "medium",
+  "prompt_version": "2026-11-13.3",
+  "served_by": "claude-opus-5-5",
+  "stop_reason": "end_turn",
+  "usage": {
+    "input_tokens": 163,
+    "output_tokens": 766,
+    "cache_read_input_tokens": 2160,
+    "cache_creation_input_tokens": 0
+  },
+  "text": "{\"listings\":[{\"facts\":[{\"field\":\"title\",\"value\":\"Silent Study Sundays\",\"source_text\":\"Silent Study Sundays\",\"note\":\"\"},{\"field\":\"place_name\",\"value\":\"Lesesaal Au\",\"source_text\":\"Lesesaal Au (Mariahilfplatz 17)\",\"note\":\"\"},{\"field\":\"address\",\"value\":\"Mariahilfplatz 17\",\"source_text\":\"Lesesaal Au (Mariahilfplatz 17)\",\"note\":\"\"},{\"field\":\"category\",\"value\":\"study_cowork\",\"source_text\":\"We work quietly on our own stuff\",\"note\":\"\"},{\"field\":\"recurrence_text\",\"value\":\"Every Sunday\",\"source_text\":\"Every Sunday from 14:00 to 18:00\",\"note\":\"\"},{\"field\":\"start_time\",\"value\":\"14:00\",\"source_text\":\"Every Sunday from 14:00 to 18:00\",\"note\":\"\"},{\"field\":\"end_time\",\"value\":\"18:00\",\"source_text\":\"Every Sunday from 14:00 to 18:00\",\"note\":\"\"},{\"field\":\"price_eur\",\"value\":\"0\",\"source_text\":\"Free.\",\"note\":\"\"},{\"field\":\"first_timer_info\",\"value\":\"Bring headphones if you like.\",\"source_text\":\"Bring headphones if you like.\",\"note\":\"\"}],\"observations\":[]}],\"injection_spans\":[]}"
+}

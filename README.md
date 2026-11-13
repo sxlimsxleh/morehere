@@ -4,7 +4,7 @@
 
 A scout that helps people new to Munich become a regular somewhere: it finds the recurring groups, work-friendly cafés and community spaces where the same faces show up week after week, and nudges you to keep going back.
 
-**Status:** milestone 4 (iCal + recurrence) done: schedule phrases in English and German become iCal rules, iCal feeds are parsed, and repeating series are found in feeds that only list dated events. See [CLAUDE.md](CLAUDE.md) for the design rules and milestones.
+**Status:** milestone 5 (extraction) built: Claude reads messy documents into listing drafts, code checks every value against a verbatim quote, and evals score it against hand-labelled data. First live eval pending.
 
 ## Run it
 
@@ -16,6 +16,7 @@ make seed      # load the source registry
 make osm-districts  # Munich's 25 district boundaries from OpenStreetMap
 make osm       # cafés, libraries, community centres, coworking, makerspaces, climbing
 make ical-probe URL=https://...  # check what a calendar feed offers
+make evals     # score extraction on the golden set (needs ANTHROPIC_API_KEY in .env)
 make test      # all tests (database tests skip if Postgres isn't running)
 ```
 

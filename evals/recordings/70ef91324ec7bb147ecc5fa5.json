@@ -1,0 +1,14 @@
+{
+  "model": "claude-opus-5-5",
+  "effort": "medium",
+  "prompt_version": "2026-11-13.3",
+  "served_by": "claude-opus-5-5",
+  "stop_reason": "end_turn",
+  "usage": {
+    "input_tokens": 139,
+    "output_tokens": 672,
+    "cache_read_input_tokens": 2160,
+    "cache_creation_input_tokens": 0
+  },
+  "text": "{\"listings\":[{\"facts\":[{\"field\":\"title\",\"value\":\"English-German Language Café Haidhausen\",\"source_text\":\"English-German Language Café Haidhausen\",\"note\":\"\"},{\"field\":\"place_name\",\"value\":\"Café Weißenburg\",\"source_text\":\"Café Weißenburg\",\"note\":\"\"},{\"field\":\"address\",\"value\":\"Weißenburger Platz 3\",\"source_text\":\"Weißenburger Platz 3\",\"note\":\"\"},{\"field\":\"district\",\"value\":\"Haidhausen\",\"source_text\":\"English-German Language Café Haidhausen\",\"note\":\"\"},{\"field\":\"category\",\"value\":\"language_exchange\",\"source_text\":\"English-German Language Café\",\"note\":\"\"},{\"field\":\"recurrence_text\",\"value\":\"Every Tuesday\",\"source_text\":\"Every Tuesday\",\"note\":\"\"},{\"field\":\"start_time\",\"value\":\"19:00\",\"source_text\":\"at 19:00\",\"note\":\"\"},{\"field\":\"language\",\"value\":\"en+de\",\"source_text\":\"Half the evening in English, half in German.\",\"note\":\"\"},{\"field\":\"price_eur\",\"value\":\"0\",\"source_text\":\"Free, buy a drink.\",\"note\":\"Free entry; buying a drink is expected but is an extra, not the price.\"}],\"observations\":[]}],\"injection_spans\":[]}"
+}

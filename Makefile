@@ -1,4 +1,4 @@
-.PHONY: setup test test-db lint format db db-down db-reset migrate seed osm osm-districts osm-replay ical ical-probe
+.PHONY: setup test test-db lint format db db-down db-reset migrate seed osm osm-districts osm-replay ical ical-probe extract-samples extract evals evals-recorded
 
 setup:
 	uv sync
@@ -55,3 +55,21 @@ ical:
 # Check what a feed offers before adding it: make ical-probe URL=https://...
 ical-probe:
 	uv run python -m morehere.sources.ical probe "$(URL)"
+
+# --- Extraction (milestone 5) ---------------------------------------------------
+# Load data/raw/ samples into the database as raw records (for trying extraction).
+extract-samples:
+	uv run python -m morehere.extract samples
+
+# Extract every raw record without drafts (needs ANTHROPIC_API_KEY in .env).
+extract:
+	uv run python -m morehere.extract run
+
+# Live eval: calls the API, records responses, writes evals/results/.
+# Optional: make evals EFFORT=low MODEL=claude-opus-5-5 TAG=baseline
+evals:
+	uv run python evals/run_evals.py --mode live $(if $(MODEL),--model $(MODEL)) $(if $(EFFORT),--effort $(EFFORT)) $(if $(TAG),--tag $(TAG))
+
+# Replay recorded responses: no key, no network (CI).
+evals-recorded:
+	uv run python evals/run_evals.py --mode replay $(if $(MODEL),--model $(MODEL)) $(if $(EFFORT),--effort $(EFFORT)) $(if $(TAG),--tag $(TAG))

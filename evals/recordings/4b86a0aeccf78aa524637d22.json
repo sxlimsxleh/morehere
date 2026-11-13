@@ -1,0 +1,14 @@
+{
+  "model": "claude-opus-5-5",
+  "effort": "medium",
+  "prompt_version": "2026-11-13.3",
+  "served_by": "claude-opus-5-5",
+  "stop_reason": "end_turn",
+  "usage": {
+    "input_tokens": 197,
+    "output_tokens": 758,
+    "cache_read_input_tokens": 2160,
+    "cache_creation_input_tokens": 0
+  },
+  "text": "{\"listings\":[{\"facts\":[{\"field\":\"title\",\"value\":\"NEW FACES WEDNESDAY\",\"source_text\":\"NEW FACES WEDNESDAY\",\"note\":\"\"},{\"field\":\"place_name\",\"value\":\"Blockwerk\",\"source_text\":\"📍 Blockwerk, Landsberger Str. 290\",\"note\":\"\"},{\"field\":\"address\",\"value\":\"Landsberger Str. 290\",\"source_text\":\"📍 Blockwerk, Landsberger Str. 290\",\"note\":\"\"},{\"field\":\"category\",\"value\":\"sport\",\"source_text\":\"#munichbouldering\",\"note\":\"Bouldering\"},{\"field\":\"recurrence_text\",\"value\":\"every wed\",\"source_text\":\"every wed from 18h\",\"note\":\"\"},{\"field\":\"start_time\",\"value\":\"18:00\",\"source_text\":\"every wed from 18h\",\"note\":\"\"},{\"field\":\"language\",\"value\":\"en+de\",\"source_text\":\"english + deutsch 🇬🇧🇩🇪\",\"note\":\"\"},{\"field\":\"beginner_friendly\",\"value\":\"true\",\"source_text\":\"beginners welcome, our crew shows you the basics 💪\",\"note\":\"\"},{\"field\":\"first_timer_info\",\"value\":\"we meet at the big wall\",\"source_text\":\"we meet at the big wall 🙌\",\"note\":\"\"}],\"observations\":[]}],\"injection_spans\":[]}"
+}
