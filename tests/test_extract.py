@@ -112,7 +112,7 @@ def test_perfect_model_scores_perfectly() -> None:
         25, 25, 25)  # fmt: skip
     assert all(c.fp == 0 and c.fn == 0 for c in report.flags.values())
     assert report.mistakes == []
-    assert "| Field accuracy | 100% |" in to_markdown(report, "perfect")
+    assert "| Field accuracy | 100.0% |" in to_markdown(report, "perfect")
 
 
 # --- Grounding rejects what the document doesn't say -----------------------------
@@ -573,6 +573,7 @@ def test_transient_api_errors_fail_one_record_not_the_run(monkeypatch: pytest.Mo
          "Einweisung für Neue um 18:30 Uhr – newcomers get a short tour at 6:30pm.", True),
         ("title", "Clay and Chat", "clay and chat!", True),
         ("title", "Clay and Chat", "Clay Night", False),
+        ("title", "Würfel & Worte", "Würfel & Worte – board-game night", True),
         ("category", "outdoors", "arts_crafts", False),
         ("price_eur", 8, 8.0, True),
     ],

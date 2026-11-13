@@ -82,10 +82,11 @@ def _words(value: Any) -> str:
 
 
 # Free-text fields: the same words count as the same answer.
-FREE_TEXT_FIELDS = {"title", "address", "seasonal_text", "organiser_contact"}
+FREE_TEXT_FIELDS = {"address", "seasonal_text", "organiser_contact"}
 # Verbatim quotes of different length from the same passage: one containing the other is
 # the same answer ("Saal der Pfarrei St. Wolfgang" / "Pfarrei St. Wolfgang").
-CONTAINMENT_FIELDS = {"place_name", "first_timer_info"}
+# Titles too: "Würfel & Worte – board-game night" names the same thing as "Würfel & Worte".
+CONTAINMENT_FIELDS = {"title", "place_name", "first_timer_info"}
 
 
 def same_value(name: str, expected: Any, actual: Any, also_ok: list[Any] | None = None) -> bool:
@@ -289,7 +290,8 @@ def evaluate(golden: GoldenSet, extract: Callable[[GoldenFile], ExtractionResult
 
 
 def _pct(value: float | None) -> str:
-    return "—" if value is None else f"{value:.0%}"
+    # One decimal: 99.56% must not be shown as "100%".
+    return "—" if value is None else f"{value:.1%}"
 
 
 def to_markdown(report: EvalReport, title: str) -> str:

@@ -350,7 +350,9 @@ class AnthropicBackend:
                 "the key after ANTHROPIC_API_KEY=). If the variable exists but is empty in your "
                 "shell, run `unset ANTHROPIC_API_KEY` first: .env never overrides it."
             )
-        self._client = anthropic.Anthropic()
+        # 4 retries (SDK default 2): the low-effort eval lost 2 of 24 documents to a
+        # transient 503 ("grammar compilation temporarily unavailable").
+        self._client = anthropic.Anthropic(max_retries=4)
 
     def complete(self, settings: LlmSettings, system: str, user: str) -> LlmResponse:
         import anthropic

@@ -78,6 +78,7 @@
           "flags": ["not_recurring"],
           "expected_rrule": null,
           "fields": {
+            "organiser_contact": {"value": "hello@newcomers-weekly.example", "source_text": "From: Munich Newcomers Weekly <hello@newcomers-weekly.example>"},
             "title": {"value": "Lantern walk through the Englischer Garten", "source_text": "LANTERN WALK THROUGH THE ENGLISCHER GARTEN"},
             "place_name": {"value": "Chinesischer Turm", "source_text": "meeting at the Chinesischer Turm"},
             "category": {"value": "outdoors", "source_text": "LANTERN WALK THROUGH THE ENGLISCHER GARTEN"},
@@ -163,7 +164,6 @@
             "title": {"value": "Offener Chor Haidhausen", "source_text": "Offener Chor Haidhausen"},
             "place_name": {"value": "Pfarrei St. Wolfgang", "source_text": "im Saal der Pfarrei St. Wolfgang (Kellerstraße 12)"},
             "address": {"value": "Kellerstraße 12", "source_text": "im Saal der Pfarrei St. Wolfgang (Kellerstraße 12)"},
-            "district": {"value": "Au-Haidhausen", "source_text": "Offener Chor Haidhausen"},
             "category": {"value": "choir_music", "source_text": "Offener Chor Haidhausen"},
             "recurrence_text": {"value": "jeden Mittwoch", "source_text": "Wir proben jeden Mittwoch von 19:30 bis 21:00 Uhr"},
             "start_time": {"value": "19:30", "source_text": "Wir proben jeden Mittwoch von 19:30 bis 21:00 Uhr"},
@@ -191,6 +191,7 @@
           "flags": ["not_recurring"],
           "expected_rrule": null,
           "fields": {
+            "first_timer_info": {"value": "in front of the Chinesischer Turm, Englischer Garten", "source_text": "Meeting point: in front of the Chinesischer Turm, Englischer Garten"},
             "title": {"value": "Newcomers Christmas Market Meetup", "source_text": "NEWCOMERS CHRISTMAS MARKET MEETUP"},
             "place_name": {"value": "Chinesischer Turm", "source_text": "Meeting point: in front of the Chinesischer Turm, Englischer Garten"},
             "category": {"value": "social", "source_text": "NEWCOMERS CHRISTMAS MARKET MEETUP"},
@@ -300,6 +301,7 @@
           "flags": [],
           "expected_rrule": "FREQ=WEEKLY;BYDAY=WE",
           "fields": {
+            "organiser_contact": {"value": "blockwerk.muc", "source_text": "blockwerk.muc"},
             "title": {"value": "New Faces Wednesday", "source_text": "NEW FACES WEDNESDAY"},
             "place_name": {"value": "Blockwerk", "source_text": "📍 Blockwerk, Landsberger Str. 290"},
             "address": {"value": "Landsberger Str. 290", "source_text": "📍 Blockwerk, Landsberger Str. 290"},
@@ -309,7 +311,7 @@
             "language": {"value": "en+de", "source_text": "english + deutsch"},
             "price_eur": {"flagged": "only shoe rental is priced; the entry fee is not stated", "source_text": "shoes for rent 4€ at the desk"},
             "beginner_friendly": {"value": true, "source_text": "beginners welcome, our crew shows you the basics"},
-            "first_timer_info": {"value": "shoes for rent 4€ at the desk", "source_text": "shoes for rent 4€ at the desk"}
+            "first_timer_info": {"value": "shoes for rent 4€ at the desk", "source_text": "shoes for rent 4€ at the desk", "also_ok": ["we meet at the big wall"]}
           }
         }
       ]
@@ -330,7 +332,6 @@
             "title": {"value": "International Stammtisch Maxvorstadt", "source_text": "International Stammtisch Maxvorstadt"},
             "place_name": {"value": "Wirtshaus Zum Kramer", "source_text": "Wirtshaus Zum Kramer"},
             "address": {"value": "Augustenstraße 70", "source_text": "Augustenstraße 70, 80333 München"},
-            "district": {"value": "Maxvorstadt", "source_text": "International Stammtisch Maxvorstadt"},
             "category": {"value": "social", "source_text": "International Stammtisch Maxvorstadt"},
             "recurrence_text": {"value": "every Thursday", "source_text": "every Thursday"},
             "start_time": {"value": "20:00", "source_text": "\"start_time\": \"20:00\""},
@@ -356,7 +357,7 @@
           "flags": ["stale"],
           "expected_rrule": "FREQ=MONTHLY;BYDAY=2SU",
           "fields": {
-            "first_timer_info": {"value": "Any camera works, phones too.", "source_text": "Any camera works, phones too."},
+            "first_timer_info": {"value": "Any camera works, phones too.", "source_text": "Any camera works, phones too.", "also_ok": ["at the steps of the Feldherrnhalle"]},
             "title": {"value": "Munich Photo Walk Club", "source_text": "Munich Photo Walk Club"},
             "place_name": {"value": "Odeonsplatz", "source_text": "Meeting point: Odeonsplatz, at the steps of the Feldherrnhalle."},
             "category": {"value": "outdoors", "source_text": "We walk and take photos together", "also_ok": ["arts_crafts"]},
@@ -495,7 +496,7 @@
             "start_time": {"value": "14:00", "source_text": "We play biweekly on Saturdays at 14:00"},
             "price_eur": {"value": 0, "source_text": "All levels, we're happy to teach. Free."},
             "beginner_friendly": {"value": true, "source_text": "All levels, we're happy to teach."},
-            "first_timer_info": {"value": "If it rains we move to the café next door.", "source_text": "If it rains we move to the café next door."}
+            "first_timer_info": {"value": "If it rains we move to the café next door.", "source_text": "If it rains we move to the café next door.", "also_ok": ["near the fountain"]}
           }
         }
       ]
@@ -655,7 +656,6 @@
             "title": {"value": "Mitmachtag im Gemeinschaftsgarten Laim", "source_text": "Mitmachtag im Gemeinschaftsgarten Laim"},
             "place_name": {"value": "Gemeinschaftsgarten Laim", "source_text": "Ort: Gemeinschaftsgarten Laim, Fürstenrieder Straße 155"},
             "address": {"value": "Fürstenrieder Straße 155", "source_text": "Ort: Gemeinschaftsgarten Laim, Fürstenrieder Straße 155"},
-            "district": {"value": "Laim", "source_text": "Ort: Gemeinschaftsgarten Laim, Fürstenrieder Straße 155"},
             "category": {"value": "outdoors", "source_text": "Mitmachtag im Gemeinschaftsgarten Laim", "also_ok": ["volunteering"]},
             "recurrence_text": {"value": "jeden Samstag", "source_text": "Von April bis Oktober jeden Samstag von 10 bis 13 Uhr."},
             "start_time": {"value": "10:00", "source_text": "Von April bis Oktober jeden Samstag von 10 bis 13 Uhr."},
@@ -684,7 +684,6 @@
             "title": {"value": "English-German Language Café Haidhausen", "source_text": "English-German Language Café Haidhausen"},
             "place_name": {"value": "Café Weißenburg", "source_text": "at Café Weißenburg, Weißenburger Platz 3."},
             "address": {"value": "Weißenburger Platz 3", "source_text": "at Café Weißenburg, Weißenburger Platz 3."},
-            "district": {"value": "Au-Haidhausen", "source_text": "English-German Language Café Haidhausen"},
             "category": {"value": "language_exchange", "source_text": "English-German Language Café Haidhausen"},
             "recurrence_text": {"value": "Every Tuesday", "source_text": "Every Tuesday at 19:00 at Café Weißenburg"},
             "start_time": {"value": "19:00", "source_text": "Every Tuesday at 19:00 at Café Weißenburg"},

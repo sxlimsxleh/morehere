@@ -4,7 +4,7 @@
 
 A scout that helps people new to Munich become a regular somewhere: it finds the recurring groups, work-friendly cafés and community spaces where the same faces show up week after week, and nudges you to keep going back.
 
-**Status:** milestone 5 (extraction) built: Claude reads messy documents into listing drafts, code checks every value against a verbatim quote, and evals score it against hand-labelled data. First live eval pending.
+**Status:** milestone 5 (extraction) done: Claude reads messy documents into listing drafts, code checks every value against a verbatim quote, and evals score it on 24 hand-labelled Munich documents: 99.6% field accuracy, no wrong values accepted, every flag right (claude-opus-5-5, effort medium, about 1.8 cents a document). Results in `evals/results/`.
 
 ## Run it
 

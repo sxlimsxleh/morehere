@@ -1,0 +1,140 @@
+{
+  "field_accuracy": 0.9955555555555555,
+  "fields": {
+    "title": {
+      "correct": 25,
+      "total": 25
+    },
+    "place_name": {
+      "correct": 25,
+      "total": 25
+    },
+    "address": {
+      "correct": 25,
+      "total": 25
+    },
+    "district": {
+      "correct": 25,
+      "total": 25
+    },
+    "category": {
+      "correct": 25,
+      "total": 25
+    },
+    "recurrence_text": {
+      "correct": 25,
+      "total": 25
+    },
+    "start_time": {
+      "correct": 25,
+      "total": 25
+    },
+    "end_time": {
+      "correct": 25,
+      "total": 25
+    },
+    "seasonal_text": {
+      "correct": 25,
+      "total": 25
+    },
+    "language": {
+      "correct": 24,
+      "total": 25
+    },
+    "price_eur": {
+      "correct": 25,
+      "total": 25
+    },
+    "price_period": {
+      "correct": 25,
+      "total": 25
+    },
+    "come_alone": {
+      "correct": 25,
+      "total": 25
+    },
+    "beginner_friendly": {
+      "correct": 24,
+      "total": 25
+    },
+    "group_size": {
+      "correct": 25,
+      "total": 25
+    },
+    "first_timer_info": {
+      "correct": 25,
+      "total": 25
+    },
+    "organiser_contact": {
+      "correct": 25,
+      "total": 25
+    },
+    "source_updated_at": {
+      "correct": 25,
+      "total": 25
+    }
+  },
+  "wrong_accepted": {},
+  "flags": {
+    "suspected_injection": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    "not_recurring": {
+      "tp": 2,
+      "fp": 0,
+      "fn": 0
+    },
+    "cancelled": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    "stale": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    "missing_time": {
+      "tp": 2,
+      "fp": 0,
+      "fn": 0
+    },
+    "ambiguous_recurrence": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    "uncertain_source": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    }
+  },
+  "recurrence": {
+    "correct": 25,
+    "total": 25
+  },
+  "outcomes": {
+    "correct": 25,
+    "total": 25
+  },
+  "expected_listings": 25,
+  "extracted_listings": 25,
+  "matched_listings": 25,
+  "injection_listing_publishable": false,
+  "failed_files": [],
+  "usage": {
+    "input_tokens": 5835,
+    "output_tokens": 19535,
+    "cache_read_input_tokens": 56741,
+    "cache_creation_input_tokens": 2467
+  },
+  "est_cost_usd": 0.43771400000000005,
+  "duration_ms": 0,
+  "mistakes": [
+    "brettspielabend-westend.language: expected 'de', got 'flagged (Mostly German; English explanations often available, so the language is not clearly de or en+de.)'",
+    "fablab-open-night.beginner_friendly: expected True, got 'flagged (not stated)'"
+  ]
+}
