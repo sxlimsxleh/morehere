@@ -1,0 +1,14 @@
+{
+  "model": "claude-opus-5-5",
+  "effort": "low",
+  "prompt_version": "2026-11-13.4",
+  "served_by": "claude-opus-5-5",
+  "stop_reason": "end_turn",
+  "usage": {
+    "input_tokens": 477,
+    "output_tokens": 981,
+    "cache_read_input_tokens": 2467,
+    "cache_creation_input_tokens": 0
+  },
+  "text": "{\"listings\":[{\"facts\":[{\"field\":\"title\",\"value\":\"TANDEM TUESDAYS\",\"source_text\":\"1) TANDEM TUESDAYS\",\"note\":\"\"},{\"field\":\"place_name\",\"value\":\"Café Lindwurm\",\"source_text\":\"Café Lindwurm (Hohenzollernstr. 41, Schwabing)\",\"note\":\"\"},{\"field\":\"address\",\"value\":\"Hohenzollernstr. 41\",\"source_text\":\"Café Lindwurm (Hohenzollernstr. 41, Schwabing)\",\"note\":\"\"},{\"field\":\"district\",\"value\":\"Schwabing\",\"source_text\":\"Café Lindwurm (Hohenzollernstr. 41, Schwabing)\",\"note\":\"\"},{\"field\":\"category\",\"value\":\"language_exchange\",\"source_text\":\"Our favourite language café is still going strong.\",\"note\":\"\"},{\"field\":\"recurrence_text\",\"value\":\"Every Tuesday\",\"source_text\":\"Every Tuesday from 7pm at\",\"note\":\"\"},{\"field\":\"start_time\",\"value\":\"19:00\",\"source_text\":\"Every Tuesday from 7pm at\",\"note\":\"\"},{\"field\":\"price_eur\",\"value\":\"0\",\"source_text\":\"Free, you just buy a drink.\",\"note\":\"\"},{\"field\":\"beginner_friendly\",\"value\":\"true\",\"source_text\":\"Great if you're nervous about speaking German - nobody judges.\",\"note\":\"\"},{\"field\":\"organiser_contact\",\"value\":\"hello@newcomers-weekly.example\",\"source_text\":\"From: Munich Newcomers Weekly <hello@newcomers-weekly.example>\",\"note\":\"Newsletter sender; may not be the café organiser.\"}],\"observations\":[]},{\"facts\":[{\"field\":\"title\",\"value\":\"LANTERN WALK THROUGH THE ENGLISCHER GARTEN\",\"source_text\":\"2) LANTERN WALK THROUGH THE ENGLISCHER GARTEN\",\"note\":\"\"},{\"field\":\"place_name\",\"value\":\"Chinesischer Turm\",\"source_text\":\"meeting at the Chinesischer Turm.\",\"note\":\"\"},{\"field\":\"category\",\"value\":\"outdoors\",\"source_text\":\"LANTERN WALK THROUGH THE ENGLISCHER GARTEN\",\"note\":\"\"},{\"field\":\"recurrence_text\",\"value\":\"\",\"source_text\":\"One night only: Saturday 21 November\",\"note\":\"one-off\"},{\"field\":\"start_time\",\"value\":\"17:30\",\"source_text\":\"Saturday 21 November, 5:30pm\",\"note\":\"\"},{\"field\":\"price_eur\",\"value\":\"12\",\"source_text\":\"Tickets 12 EUR on our website.\",\"note\":\"\"},{\"field\":\"organiser_contact\",\"value\":\"hello@newcomers-weekly.example\",\"source_text\":\"From: Munich Newcomers Weekly <hello@newcomers-weekly.example>\",\"note\":\"\"}],\"observations\":[{\"kind\":\"one_off\",\"source_text\":\"One night only: Saturday 21 November, 5:30pm, meeting at the Chinesischer Turm.\"}]}],\"injection_spans\":[]}"
+}

@@ -1,0 +1,14 @@
+{
+  "model": "claude-opus-5-5",
+  "effort": "medium",
+  "prompt_version": "2026-11-13.4",
+  "served_by": "claude-opus-5-5",
+  "stop_reason": "end_turn",
+  "usage": {
+    "input_tokens": 121,
+    "output_tokens": 485,
+    "cache_read_input_tokens": 2467,
+    "cache_creation_input_tokens": 0
+  },
+  "text": "{\"listings\":[{\"facts\":[{\"field\":\"title\",\"value\":\"Würfel & Worte – board-game night\",\"source_text\":\"Würfel & Worte – board-game night\",\"note\":\"\"},{\"field\":\"place_name\",\"value\":\"Café Kiebitz\",\"source_text\":\"Every Friday at Café Kiebitz in Neuhausen (Volkartstraße 22).\",\"note\":\"\"},{\"field\":\"address\",\"value\":\"Volkartstraße 22\",\"source_text\":\"Every Friday at Café Kiebitz in Neuhausen (Volkartstraße 22).\",\"note\":\"\"},{\"field\":\"district\",\"value\":\"Neuhausen\",\"source_text\":\"Every Friday at Café Kiebitz in Neuhausen (Volkartstraße 22).\",\"note\":\"\"},{\"field\":\"category\",\"value\":\"board_games\",\"source_text\":\"Würfel & Worte – board-game night\",\"note\":\"\"},{\"field\":\"recurrence_text\",\"value\":\"Every Friday\",\"source_text\":\"Every Friday at Café Kiebitz in Neuhausen (Volkartstraße 22).\",\"note\":\"\"},{\"field\":\"price_eur\",\"value\":\"0\",\"source_text\":\"No entry fee.\",\"note\":\"\"},{\"field\":\"beginner_friendly\",\"value\":\"true\",\"source_text\":\"Teaching new players is half the fun.\",\"note\":\"\"},{\"field\":\"first_timer_info\",\"value\":\"Bring a game or play one of ours.\",\"source_text\":\"Bring a game or play one of ours.\",\"note\":\"\"}],\"observations\":[]}],\"injection_spans\":[]}"
+}

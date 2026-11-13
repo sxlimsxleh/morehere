@@ -1,0 +1,14 @@
+{
+  "model": "claude-opus-5-5",
+  "effort": "low",
+  "prompt_version": "2026-11-13.4",
+  "served_by": "claude-opus-5-5",
+  "stop_reason": "end_turn",
+  "usage": {
+    "input_tokens": 227,
+    "output_tokens": 676,
+    "cache_read_input_tokens": 2467,
+    "cache_creation_input_tokens": 0
+  },
+  "text": "{\"listings\":[{\"facts\":[{\"field\":\"title\",\"value\":\"Kreativabend / Creative Night\",\"source_text\":\"Kreativabend / Creative Night\",\"note\":\"\"},{\"field\":\"place_name\",\"value\":\"Atelier Farbfleck\",\"source_text\":\"Atelier Farbfleck, Thalkirchner Straße 104, Isarvorstadt\",\"note\":\"\"},{\"field\":\"address\",\"value\":\"Thalkirchner Straße 104\",\"source_text\":\"Atelier Farbfleck, Thalkirchner Straße 104, Isarvorstadt\",\"note\":\"\"},{\"field\":\"district\",\"value\":\"Isarvorstadt\",\"source_text\":\"Atelier Farbfleck, Thalkirchner Straße 104, Isarvorstadt\",\"note\":\"\"},{\"field\":\"category\",\"value\":\"arts_crafts\",\"source_text\":\"Malen, Zeichnen, Collagen – Material ist da. Painting, drawing, collage – materials provided.\",\"note\":\"\"},{\"field\":\"recurrence_text\",\"value\":\"Jeden letzten Freitag im Monat\",\"source_text\":\"Jeden letzten Freitag im Monat ab 19 Uhr / every last Friday of the month from 7pm\",\"note\":\"\"},{\"field\":\"start_time\",\"value\":\"19:00\",\"source_text\":\"Jeden letzten Freitag im Monat ab 19 Uhr / every last Friday of the month from 7pm\",\"note\":\"\"},{\"field\":\"price_eur\",\"value\":\"10\",\"source_text\":\"Unkostenbeitrag 10 € / 10 € to cover materials\",\"note\":\"\"},{\"field\":\"come_alone\",\"value\":\"true\",\"source_text\":\"Ihr könnt gern allein kommen / feel free to come on your own\",\"note\":\"\"},{\"field\":\"first_timer_info\",\"value\":\"Malen, Zeichnen, Collagen – Material ist da. Painting, drawing, collage – materials provided.\",\"source_text\":\"Malen, Zeichnen, Collagen – Material ist da. Painting, drawing, collage – materials provided.\",\"note\":\"\"}],\"observations\":[]}],\"injection_spans\":[]}"
+}

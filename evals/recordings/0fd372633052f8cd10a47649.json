@@ -1,0 +1,14 @@
+{
+  "model": "claude-opus-5-5",
+  "effort": "low",
+  "prompt_version": "2026-11-13.4",
+  "served_by": "claude-opus-5-5",
+  "stop_reason": "end_turn",
+  "usage": {
+    "input_tokens": 391,
+    "output_tokens": 738,
+    "cache_read_input_tokens": 2467,
+    "cache_creation_input_tokens": 0
+  },
+  "text": "{\"listings\":[{\"facts\":[{\"field\":\"title\",\"value\":\"Pub Quiz in English\",\"source_text\":\"SUMMARY:Pub Quiz in English\",\"note\":\"\"},{\"field\":\"place_name\",\"value\":\"The Crooked Fox\",\"source_text\":\"LOCATION:The Crooked Fox, Rosenheimer Straße 152, 81669 München\",\"note\":\"\"},{\"field\":\"address\",\"value\":\"Rosenheimer Straße 152\",\"source_text\":\"LOCATION:The Crooked Fox, Rosenheimer Straße 152, 81669 München\",\"note\":\"\"},{\"field\":\"category\",\"value\":\"social\",\"source_text\":\"SUMMARY:Pub Quiz in English\",\"note\":\"\"},{\"field\":\"recurrence_text\",\"value\":\"FREQ=WEEKLY;BYDAY=WE\",\"source_text\":\"RRULE:FREQ=WEEKLY;BYDAY=WE\",\"note\":\"\"},{\"field\":\"start_time\",\"value\":\"20:00\",\"source_text\":\"DTSTART;TZID=Europe/Berlin:20260107T200000\",\"note\":\"\"},{\"field\":\"end_time\",\"value\":\"22:30\",\"source_text\":\"DTEND;TZID=Europe/Berlin:20260107T223000\",\"note\":\"\"},{\"field\":\"seasonal_text\",\"value\":\"No quiz on 23 and 30 December.\",\"source_text\":\"No quiz on 23 and 30 December.\",\"note\":\"\"},{\"field\":\"language\",\"value\":\"en\",\"source_text\":\"SUMMARY:Pub Quiz in English\",\"note\":\"\"},{\"field\":\"price_eur\",\"value\":\"5\",\"source_text\":\"5 EUR per person, the winning team gets a bar tab.\",\"note\":\"\"},{\"field\":\"price_period\",\"value\":\"per_visit\",\"source_text\":\"5 EUR per person, the winning team gets a bar tab.\",\"note\":\"\"},{\"field\":\"come_alone\",\"value\":\"true\",\"source_text\":\"Solo players get matched into a team at the door.\",\"note\":\"\"},{\"field\":\"group_size\",\"value\":\"\",\"source_text\":\"Teams of up to 6.\",\"note\":\"Team size, not total participant count.\"},{\"field\":\"first_timer_info\",\"value\":\"Solo players get matched into a team at the door.\",\"source_text\":\"Solo players get matched into a team at the door.\",\"note\":\"\"}],\"observations\":[]}],\"injection_spans\":[]}"
+}

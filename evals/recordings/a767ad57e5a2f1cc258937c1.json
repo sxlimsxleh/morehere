@@ -1,0 +1,14 @@
+{
+  "model": "claude-opus-5-5",
+  "effort": "medium",
+  "prompt_version": "2026-11-13.4",
+  "served_by": "claude-opus-5-5",
+  "stop_reason": "end_turn",
+  "usage": {
+    "input_tokens": 170,
+    "output_tokens": 758,
+    "cache_read_input_tokens": 2467,
+    "cache_creation_input_tokens": 0
+  },
+  "text": "{\"listings\":[{\"facts\":[{\"field\":\"title\",\"value\":\"NEWCOMERS CHRISTMAS MARKET MEETUP\",\"source_text\":\"NEWCOMERS CHRISTMAS MARKET MEETUP\",\"note\":\"\"},{\"field\":\"place_name\",\"value\":\"Chinesischer Turm\",\"source_text\":\"Meeting point: in front of the Chinesischer Turm, Englischer Garten\",\"note\":\"\"},{\"field\":\"category\",\"value\":\"social\",\"source_text\":\"Let's warm up with Glühwein before the holidays!\",\"note\":\"\"},{\"field\":\"recurrence_text\",\"value\":\"\",\"source_text\":\"Saturday 12 December 2026, 6pm\",\"note\":\"one-off\"},{\"field\":\"start_time\",\"value\":\"18:00\",\"source_text\":\"Saturday 12 December 2026, 6pm\",\"note\":\"\"},{\"field\":\"price_eur\",\"value\":\"0\",\"source_text\":\"Free, you pay for your own drinks.\",\"note\":\"\"},{\"field\":\"come_alone\",\"value\":\"true\",\"source_text\":\"come alone or bring friends\",\"note\":\"\"},{\"field\":\"first_timer_info\",\"value\":\"Meeting point: in front of the Chinesischer Turm, Englischer Garten\",\"source_text\":\"Meeting point: in front of the Chinesischer Turm, Englischer Garten\",\"note\":\"\"}],\"observations\":[{\"kind\":\"one_off\",\"source_text\":\"This is a one-time event.\"}]}],\"injection_spans\":[]}"
+}
