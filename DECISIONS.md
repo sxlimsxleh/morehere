@@ -196,3 +196,9 @@ On the same recorded responses, the scoring, grounding and label changes alone t
 
 - iCal EXDATEs aren't carried into drafts, so the pub quiz's Christmas skips are lost.
 - Places created from text have no coordinates (no geocoding service yet: another external host with its own terms).
+
+## M6 · Fix: a name match must not contradict an address
+
+- **Found in the first full live run (Codespace, with OSM loaded):** the sample "Stadtteilladen Giesing (Silberhornstraße 4)" was attached to a real OSM place with the same name at Tegernseer Landstraße 113, because the name-only rule ignored that both had addresses and they differed. In production that puts an activity on the map at the wrong address.
+- **Fix:** a name-only match is allowed only when the draft or the place has no address, or both addresses agree; otherwise a new place is created. Tests use the exact case; the test fails without the fix.
+- **Lesson:** tests built only from invented data can't find collisions with the real city. The first run against real OSM data found this in one pass.
