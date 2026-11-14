@@ -24,7 +24,10 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 # Shared vocabularies
 # ---------------------------------------------------------------------------
 
-SourceKind = Literal["osm", "ical", "submission", "email", "tip", "places_api", "web_page"]
+# "curator": a person's decision in the admin (milestone 7); stored like any other source.
+SourceKind = Literal[
+    "osm", "ical", "submission", "email", "tip", "places_api", "web_page", "curator"
+]
 
 # How we are allowed to use a source (see "Data sources" in the plan).
 LegalStatus = Literal[

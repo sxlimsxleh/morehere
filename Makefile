@@ -1,4 +1,4 @@
-.PHONY: setup test test-db lint format db db-down db-reset migrate seed osm osm-districts osm-replay ical ical-probe extract-samples extract evals evals-recorded promote freshness
+.PHONY: setup test test-db lint format db db-down db-reset migrate seed osm osm-districts osm-replay ical ical-probe extract-samples extract evals evals-recorded promote freshness admin curation-report
 
 setup:
 	uv sync
@@ -82,3 +82,12 @@ promote:
 # Hide published listings not verified within freshness_days; show re-verified ones.
 freshness:
 	uv run python -m morehere.freshness
+
+# --- Curator admin (milestone 7) --------------------------------------------------
+# Opens on http://localhost:8501 (Codespaces forwards the port). Name from CURATOR_NAME.
+admin:
+	uv run streamlit run admin/curate.py
+
+# How often did curators correct the extractor? (held-out = outside the golden samples)
+curation-report:
+	uv run python -m morehere.curation report

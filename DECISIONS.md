@@ -202,3 +202,19 @@ On the same recorded responses, the scoring, grounding and label changes alone t
 - **Found in the first full live run (Codespace, with OSM loaded):** the sample "Stadtteilladen Giesing (Silberhornstraße 4)" was attached to a real OSM place with the same name at Tegernseer Landstraße 113, because the name-only rule ignored that both had addresses and they differed. In production that puts an activity on the map at the wrong address.
 - **Fix:** a name-only match is allowed only when the draft or the place has no address, or both addresses agree; otherwise a new place is created. Tests use the exact case; the test fails without the fix.
 - **Lesson:** tests built only from invented data can't find collisions with the real city. The first run against real OSM data found this in one pass.
+
+## M7 · Curators are a source (rule 2 applies to people)
+
+- **Chose:** a curator's edit is stored as a raw record from the `curator` source ("Selim, 2026-11-15: title = 'Isar Morning Runners'. Their website writes it this way.") and the new value's evidence quotes it. Every value in the app traces back to a quoted document or a named person on a date; `curator_actions` logs who did what and why.
+- **Rejected:** editing values in place with no evidence. It would make "every fact has a source" true only until the first correction.
+- Drafts are never changed by curators: they keep what the model extracted, so the curation report can say how often each field had to be corrected.
+
+## M7 · The honest accuracy number: the curation report
+
+- `make curation-report` counts, per field over published listings, facts kept as extracted vs corrected by a curator. "Held out" excludes listings from the golden samples, whose labels were tuned after seeing model output. This replaces the optimistic 99.6% as the number to quote once ~60 real listings are curated.
+
+## M7 · Admin scope
+
+- Local or Codespace only, no login; the curator's name comes from `CURATOR_NAME`. A hosted admin needs real authentication first.
+- **Not built (deferred):** "unmerge". Splitting a merged listing correctly means re-promoting its drafts while preventing them from merging again, plus deciding where curator edits go. Until a real case needs it: hide the merged listing with a reason and re-add the sources.
+- The UI is a thin layer over `curation.Curator`; `AppTest` runs it headless in the tests (queue renders, a listing is opened and published through the real button).

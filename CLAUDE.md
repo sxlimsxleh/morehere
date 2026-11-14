@@ -79,9 +79,12 @@ src/morehere/
   merge.py                   # same_activity() + merge by source reliability, conflicts noted
   score.py                   # Regular Score (deterministic, weights from config; unknown = 0.5)
   freshness.py               # hide stale published listings, show re-verified ones
+  curation.py                # curator actions (approve, verify, edit, place, merge, hide),
+                             #   add_from_text, curation_report; Curator = DB layer + audit log
   api/                       # FastAPI app
   logging.py                 # JSON logs: run_context(), timed_step(); loggers named morehere.*
-admin/curate.py              # Streamlit curator queue: approve, fix, merge, verify
+admin/curate.py              # Streamlit curator admin (local only, no login): queue, listing
+                             #   with evidence, add from text, report, activity log
 evals/run_evals.py           # field accuracy, flag precision/recall, recurrence accuracy, merge precision
 evals/recordings/            # recorded LLM responses so CI runs without an API key
 app/                         # Expo app (later)
@@ -96,7 +99,7 @@ The source of truth is `src/morehere/models.py`; this is the summary.
 
 - `Evidence`: `source_id`, `raw_record_id`, `source_text` (verbatim), `url | None`, `captured_at`
 - `ExtractedField[T]`: `value: T | None`, `evidence: Evidence | None`, `status: "ok" | "flagged"`, `reason: str | None`. Validated: `ok` needs value + evidence; `flagged` needs a reason and no value.
-- `Source`: `source_id`, `kind` (`osm | ical | submission | email | tip | places_api | web_page`), `name`, `legal_status`, `licence`, `attribution`, `refresh_cron`, `reliability: float`, `url | None` (set for sources we pull, e.g. one per iCal feed)
+- `Source`: `source_id`, `kind` (`osm | ical | submission | email | tip | places_api | web_page | curator`), `name`, `legal_status`, `licence`, `attribution`, `refresh_cron`, `reliability: float`, `url | None` (set for sources we pull, e.g. one per iCal feed)
 - `RawRecord`: `raw_record_id`, `source_id`, `fetched_at`, `sha256` (validated against payload), `content_type`, `url`, `payload`
 - `Place`: `place_id`, `name`, `address`, `district`, `geo` (lat/lon), `osm_id | None`, `kind` (cafe, library, community_centre, …), `osm_tags` (raw OSM map data, not user-facing tags)
 - `Schedule`: `rrule` (no `RRULE:` prefix), `dtstart` (naive local time), `duration_min`, `exdates`, `timezone="Europe/Berlin"`, `breaks: list[ScheduleBreak(label, months)]`
@@ -104,6 +107,8 @@ The source of truth is `src/morehere/models.py`; this is the summary.
 - `Listing` (a recurring thing at a place, after code and a curator decide): `listing_id`, `title`, `place_id`, `category`, `schedule: Schedule | None`, `language`, `price_eur`, `price_period`, `come_alone`, `beginner_friendly`, `group_size`, `first_timer_info`, `organiser_contact`, `tags`, `field_evidence: dict[field, Evidence]`, `status` (`draft | needs_review | published | hidden`), `last_verified_at`, `source_ids`, `review_notes` (for curators: conflicts, flags, missing facts), `regular_score` (without distance). Validated: `published` needs an evidenced schedule, `last_verified_at` and a source.
 - `Tag`: `name`, `evidence: Evidence` (no evidence, no tag)
 - `RegularScore`: `total: float`, `components: dict[str, float]` (recurrence, newcomer-welcome, English, group size, price, distance), `based_on: dict[component, list[field or tag]]`
+
+Curator edits are facts too: each is a raw record from the `curator` source ("Selim, 2026-11-15: start_time = '19:30'. Confirmed by phone.") with evidence quoting it. Drafts are never changed by curators.
 
 Flags a draft can carry: `suspected_injection`, `not_recurring`, `cancelled`, `stale`, `missing_time`, `ambiguous_recurrence`, `uncertain_source`. Any flag sends the draft to the curator queue.
 
@@ -147,7 +152,8 @@ make evals     # live evals (needs key), records responses; EFFORT=, MODEL=, TAG
 make evals-recorded  # replay recordings: no key, no network (CI)
 make promote   # pending drafts -> listings (merge, tags, score); never publishes
 make freshness # hide stale published listings, show re-verified ones
-make admin     # streamlit curator admin
+make admin     # streamlit curator admin on :8501 (CURATOR_NAME in .env)
+make curation-report  # how often curators corrected the extractor (held-out vs samples)
 make api       # uvicorn API
 ```
 

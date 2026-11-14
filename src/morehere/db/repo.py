@@ -18,6 +18,7 @@ from sqlalchemy.dialects.postgresql import array, insert
 from sqlalchemy.orm import Session
 
 from morehere.db.tables import (
+    CuratorActionRow,
     DistrictRow,
     EvidenceRow,
     ListingDraftRow,
@@ -485,3 +486,67 @@ def set_draft_review(
 def get_draft(session: Session, draft_id: int) -> ListingDraft | None:
     row = session.get(ListingDraftRow, draft_id)
     return ListingDraft.model_validate(row.draft) if row else None
+
+
+# ---------------------------------------------------------------------------
+# Curation (milestone 7)
+# ---------------------------------------------------------------------------
+
+
+def log_action(
+    session: Session,
+    curator: str,
+    action: str,
+    listing_id: str | None,
+    details: dict[str, Any] | None = None,
+) -> None:
+    session.add(
+        CuratorActionRow(
+            curator=curator, action=action, listing_id=listing_id, details=details or {}
+        )
+    )
+    session.flush()
+
+
+def list_actions(
+    session: Session, listing_id: str | None = None, limit: int = 100
+) -> list[dict[str, Any]]:
+    stmt = select(CuratorActionRow).order_by(CuratorActionRow.action_id.desc()).limit(limit)
+    if listing_id is not None:
+        stmt = stmt.where(CuratorActionRow.listing_id == listing_id)
+    return [
+        {
+            "at": r.at,
+            "curator": r.curator,
+            "action": r.action,
+            "listing_id": r.listing_id,
+            "details": r.details,
+        }  # fmt: skip
+        for r in session.scalars(stmt)
+    ]
+
+
+def search_places(session: Session, query: str, limit: int = 20) -> list[Place]:
+    """Places whose name or address contains the query (case-insensitive)."""
+    pattern = f"%{query.strip()}%"
+    stmt = (
+        select(*_place_columns())
+        .where(PlaceRow.name.ilike(pattern) | PlaceRow.address.ilike(pattern))
+        .order_by(PlaceRow.name)
+        .limit(limit)
+    )
+    return [_place_from_mapping(m) for m in session.execute(stmt)]
+
+
+def get_raw_record(session: Session, raw_record_id: str) -> RawRecord | None:
+    row = session.get(RawRecordRow, raw_record_id)
+    return _raw_record_from_row(row) if row else None
+
+
+def drafts_for_listing(session: Session, listing_id: str) -> list[ListingDraft]:
+    rows = session.scalars(
+        select(ListingDraftRow.draft)
+        .where(ListingDraftRow.listing_id == listing_id)
+        .order_by(ListingDraftRow.draft_id)
+    )
+    return [ListingDraft.model_validate(data) for data in rows]

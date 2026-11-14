@@ -4,7 +4,7 @@
 
 A scout that helps people new to Munich become a regular somewhere: it finds the recurring groups, work-friendly cafés and community spaces where the same faces show up week after week, and nudges you to keep going back.
 
-**Status:** milestone 6 (listings) done: drafts become listings at places, duplicates from different sources merge into one, stale listings hide themselves, and every listing has a Regular Score that says what it's based on. Extraction: 99.6% field accuracy on 24 hand-labelled documents (see `evals/results/`).
+**Status:** milestone 7 (curator admin) built: a local Streamlit admin to review the queue, see every fact next to its quote, correct and publish listings, and add new ones by pasting text. Next: hand-curating the first 60 real listings.
 
 ## Run it
 
@@ -18,6 +18,7 @@ make osm       # cafés, libraries, community centres, coworking, makerspaces, c
 make ical-probe URL=https://...  # check what a calendar feed offers
 make evals     # score extraction on the golden set (needs ANTHROPIC_API_KEY in .env)
 make extract-samples && make extract && make promote  # samples -> drafts -> listings
+make admin     # curator admin on http://localhost:8501
 make test      # all tests (database tests skip if Postgres isn't running)
 ```
 
