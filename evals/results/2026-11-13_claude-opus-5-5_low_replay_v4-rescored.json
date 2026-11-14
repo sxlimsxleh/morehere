@@ -138,11 +138,16 @@
     "cache_creation_input_tokens": 0
   },
   "est_cost_usd": 0.28142199999999995,
-  "duration_ms": 0,
+  "duration_ms": 2,
   "mistakes": [
     "tandem-tuesday-newsletter.beginner_friendly: expected 'flagged', got True",
     "tandem-tuesday-newsletter.organiser_contact: expected 'flagged', got 'hello@newcomers-weekly.example'",
     "brettspielabend-westend.language: expected 'de', got 'flagged (Mostly German; English explanations often available.)'",
     "photo-walk-club.beginner_friendly: expected 'flagged', got True"
-  ]
+  ],
+  "merges": {
+    "tp": 1,
+    "fp": 0,
+    "fn": 0
+  }
 }

@@ -171,3 +171,28 @@ On the same recorded responses, the scoring, grounding and label changes alone t
 - **Chose effort `medium`** (already the default in `config/llm.yaml`). Low is ~36% cheaper (about 1.2 vs 1.8 cents a document) but accepted 3 wrong values on judgement fields (beginner-friendly from "nobody judges", a newsletter's email as an organiser's contact). At our volume the difference is cents; wrong values reach users.
 - **Also:** the SDK now retries 4 times (low lost 2 documents to "grammar compilation temporarily unavailable"), and reports show one decimal (99.56% had been displayed as "100%").
 - **Caveat, honestly:** labels were revised after seeing model output, on only 24 documents, so 99.6% is an optimistic number. The real test is new documents the labels have never been tuned on: the listings curated in milestone 7 will become a held-out set.
+
+## M6 · Same activity = same place + same rule + start within 30 minutes
+
+- **Chose:** titles don't decide (the Luma feed and the newsletter name Tandem Tuesday differently); place, schedule rule and start time do. Places match by normalised address ("Hohenzollernstr. 41" = "Hohenzollernstraße 41") with a name check, or by a very similar name in the same district; otherwise a new place is created from the text (no coordinates until a curator adds them).
+- **Rejected:** title similarity as the main signal: it would merge the decoy "English-German Language Café Haidhausen" with Tandem Tuesday (same day, same time, similar name, different café).
+- **Evidence so far is thin:** the golden set has exactly one true duplicate pair and one decoy. Merge precision/recall is 100% on perfect drafts and on both recorded live runs, but that's one pair. The curated listings in milestone 7 should add more.
+
+## M6 · Conflicts: the more reliable source wins, and the curator is told
+
+- Per field, the value from the source with the higher `reliability` in `config/sources.yaml` is kept, and the listing gets a review note ("conflict on price_eur: 5.0 (email-inbox) vs 0.0 (organiser-form); kept organiser-form"). A conflict sends a published listing back to review.
+
+## M6 · Regular Score: unknown is neutral, distance waits for the user
+
+- Unknown fields count 0.5 and are named in `based_on` ("unknown: language"), so groups with terse websites aren't buried. Distance needs the user's location, so it's scored at query time (milestone 8); without it the weights are rescaled over the other five.
+- Scales (weekly 1.0 / every other week 0.7 / monthly 0.5; free 1.0 ... over 20 € 0.2; small group 1.0 ...) are starting points to tune against "I went" data, not findings.
+
+## M6 · Verification and freshness
+
+- A fact counts as verified when its source was fetched, unless the source is stale itself (the photo walk's page says "last updated March 2026", so that listing starts unverified). `make freshness` hides published listings not verified within 60 days and shows them again once re-verified; a curator's own "hidden" is never undone.
+- **Where the AI got it wrong:** the first version of the new database tests committed listings and left them behind, which broke the OSM tests that ran after them; then the cleanup itself failed, because deleting a listing leaves the evidence rows it pointed at. Tests now clean up before and after, evidence included.
+
+## M6 · Known limits (deferred, agreed)
+
+- iCal EXDATEs aren't carried into drafts, so the pub quiz's Christmas skips are lost.
+- Places created from text have no coordinates (no geocoding service yet: another external host with its own terms).

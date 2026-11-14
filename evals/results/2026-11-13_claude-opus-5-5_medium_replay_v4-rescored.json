@@ -132,9 +132,14 @@
     "cache_creation_input_tokens": 2467
   },
   "est_cost_usd": 0.43771400000000005,
-  "duration_ms": 0,
+  "duration_ms": 1,
   "mistakes": [
     "brettspielabend-westend.language: expected 'de', got 'flagged (Mostly German; English explanations often available, so the language is not clearly de or en+de.)'",
     "fablab-open-night.beginner_friendly: expected True, got 'flagged (not stated)'"
-  ]
+  ],
+  "merges": {
+    "tp": 1,
+    "fp": 0,
+    "fn": 0
+  }
 }

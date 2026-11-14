@@ -176,6 +176,11 @@ class ListingRow(Base):
     organiser_contact: Mapped[str | None] = mapped_column(Text)
     status: Mapped[str] = mapped_column(Text, nullable=False, server_default="draft")
     last_verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    review_notes: Mapped[list[str]] = mapped_column(ARRAY(Text), nullable=False,
+                                                    server_default="{}")  # fmt: skip
+    # The RegularScore as JSON, plus its total as a column so feeds can sort by it.
+    regular_score: Mapped[dict[str, Any] | None] = mapped_column(JSONB(none_as_null=True))
+    score_total: Mapped[float | None] = mapped_column(Float)
     created_at: Mapped[datetime] = _created_at()
     updated_at: Mapped[datetime] = _updated_at()
 
@@ -190,6 +195,7 @@ class ListingRow(Base):
             name="published_needs_schedule_and_verification",
         ),
         Index("ix_listings_status", "status"),
+        Index("ix_listings_score_total", "score_total"),
         Index("ix_listings_place_id", "place_id"),
     )
 

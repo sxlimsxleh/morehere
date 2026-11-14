@@ -191,6 +191,8 @@ class EvalReport:
     est_cost_usd: float = 0.0
     duration_ms: int = 0
     mistakes: list[str] = field(default_factory=list)
+    # Pairs of drafts promoted into the same listing vs pairs in the same merge_group.
+    merges: FlagCount = field(default_factory=FlagCount)
 
     def field_accuracy(self) -> float | None:
         correct = sum(c.correct for c in self.fields.values())
@@ -252,6 +254,7 @@ def _score_pair(
 
 def evaluate(golden: GoldenSet, extract: Callable[[GoldenFile], ExtractionResult]) -> EvalReport:
     report = EvalReport()
+    labelled_drafts: list[tuple[GoldenListing | None, ListingDraft]] = []
     for gfile in golden.files:
         report.expected_listings += len(gfile.listings)
         try:
@@ -268,6 +271,8 @@ def evaluate(golden: GoldenSet, extract: Callable[[GoldenFile], ExtractionResult
         for key, value in result.usage.items():
             report.usage[key] += value
         for label, draft in match_listings(gfile.listings, result.drafts):
+            if draft is not None:
+                labelled_drafts.append((label, draft))
             if label is not None and draft is not None:
                 report.matched_listings += 1
                 _score_pair(report, golden, gfile, label, draft)
@@ -281,7 +286,34 @@ def evaluate(golden: GoldenSet, extract: Callable[[GoldenFile], ExtractionResult
                 )
                 for flag in draft.flags:
                     report.flags[flag].fp += 1
+    _score_merges(report, labelled_drafts)
     return report
+
+
+def _score_merges(
+    report: EvalReport, labelled: list[tuple[GoldenListing | None, ListingDraft]]
+) -> None:
+    """Promote the drafts (no database, no OSM places) and compare which ended up together
+    with the labels' merge groups, pair by pair."""
+    from morehere.config import load_city_config
+    from morehere.db.seed import load_sources
+    from morehere.promote import promote
+
+    reliability = {s.source_id: s.reliability for s in load_sources()}
+    result = promote([(i, d) for i, (_, d) in enumerate(labelled)], [], [], reliability,
+                     load_city_config().score_weights)  # fmt: skip
+    listing_of = result.draft_to_listing
+    for i in range(len(labelled)):
+        for j in range(i + 1, len(labelled)):
+            a, b = labelled[i][0], labelled[j][0]
+            want = bool(a and b and a.merge_group and a.merge_group == b.merge_group)
+            got = listing_of.get(i) is not None and listing_of.get(i) == listing_of.get(j)
+            report.merges.tp += want and got
+            report.merges.fp += got and not want
+            report.merges.fn += want and not got
+            if want != got:
+                names = (a.key if a else "?", b.key if b else "?")
+                report.mistakes.append(f"merge {names}: expected {want} got {got}")
 
 
 # ---------------------------------------------------------------------------
@@ -305,6 +337,9 @@ def to_markdown(report: EvalReport, title: str) -> str:
         f"| Outcome accuracy | {_pct(report.outcomes.rate)} |",
         f"| Listings expected / extracted / matched | {report.expected_listings} / "
         f"{report.extracted_listings} / {report.matched_listings} |",
+        f"| Merge precision / recall | {_pct(report.merges.precision)} / "
+        f"{_pct(report.merges.recall)} ({report.merges.tp} / {report.merges.fp} / "
+        f"{report.merges.fn} TP/FP/FN) |",
         f"| Injection listing publishable | {'**YES**' if report.injection_listing_publishable else 'no'} |",  # noqa: E501
         f"| Failed files | {len(report.failed_files)} |",
         f"| Tokens in / out / cache read | {report.usage.get('input_tokens', 0)} / "
@@ -348,4 +383,5 @@ def to_json(report: EvalReport) -> dict[str, Any]:
         "est_cost_usd": report.est_cost_usd,
         "duration_ms": report.duration_ms,
         "mistakes": report.mistakes,
+        "merges": vars(report.merges),
     }
