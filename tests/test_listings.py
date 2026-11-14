@@ -83,6 +83,22 @@ def test_unknown_venue_becomes_a_new_place_without_coordinates() -> None:
     assert match.place.place_id.startswith("draft-")
 
 
+def test_same_name_at_a_different_address_is_not_matched() -> None:
+    # Found in the first full live run: the sample "Stadtteilladen Giesing (Silberhornstraße
+    # 4)" was attached to a real OSM place of the same name at Tegernseer Landstraße 113.
+    real = Place(place_id="osm-node-9", name="Stadtteilladen Giesing",
+                 address="Tegernseer Landstraße 113", kind="community_centre")  # fmt: skip
+    match = resolve_place(draft_for("repair-cafe-giesing"), [real])
+    assert match.how == "created"
+    assert match.place.address == "Silberhornstraße 4"
+
+
+def test_name_match_still_works_when_one_side_has_no_address() -> None:
+    odeonsplatz = Place(place_id="p-1", name="Odeonsplatz", kind="meeting_point")
+    match = resolve_place(draft_for("photo-walk-club"), [odeonsplatz])
+    assert (match.how, match.place.place_id) == ("name", "p-1")
+
+
 def test_a_different_cafe_at_the_same_address_is_not_matched() -> None:
     bakery = OSM_LINDWURM.model_copy(update={"place_id": "osm-node-2", "name": "Bäckerei Zuckerl"})
     assert resolve_place(draft_for("tandem-tuesday-newsletter"), [bakery]).how == "created"

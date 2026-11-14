@@ -78,7 +78,14 @@ def resolve_place(draft: ListingDraft, places: list[Place]) -> PlaceMatch:
             return PlaceMatch(best, "address")
     if name:
         district = draft.district.value
-        candidates = [p for p in places if district is None or p.district in (None, district)]
+        # A name match must not contradict an address: a place with the same name at a
+        # different address is a different place (or the same name used twice in a city).
+        candidates = [
+            p
+            for p in places
+            if (district is None or p.district in (None, district))
+            and not (key and address_key(p.address) and address_key(p.address) != key)
+        ]
         best = max(candidates, key=lambda p: _similar(p.name, name), default=None)
         if best and _similar(best.name, name) >= NAME_MATCH_ALONE:
             return PlaceMatch(best, "name")
