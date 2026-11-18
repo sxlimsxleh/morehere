@@ -93,9 +93,11 @@ evals/run_evals.py           # field accuracy, flag precision/recall, recurrence
 evals/recordings/            # recorded LLM responses so CI runs without an API key
 app/                         # Expo app (milestone 9); for now openapi.json + generated
                              #   src/api/schema.ts (npm run gen:api, openapi-typescript)
+                             #   + src/theme/tokens.ts (brand colours, type, spacing)
 tests/                       # tests/fixtures: hand-built API responses (not real data)
 DECISIONS.md                 # decision, rejected alternative, where the AI got it wrong
-docs/                        # research notes, e.g. docs/ical-sources.md
+docs/                        # research notes, e.g. docs/ical-sources.md; docs/brand.md
+                             #   (brand rules + voice; contrast checked by a test)
 ```
 
 ## Data contracts (agreed in M1; ask before changing)

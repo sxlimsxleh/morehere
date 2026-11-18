@@ -245,3 +245,16 @@ On the same recorded responses, the scoring, grounding and label changes alone t
 - **Found in real use:** setting `beginner_friendly = True` on a second listing the same day crashed the admin with a foreign-key error. The record text ("Selim, 2026-11-18: beginner_friendly = True.") was identical, raw records are stored once per (source, sha256), so the second was skipped, and the listing's evidence pointed at an id that was never stored. Nothing was half-saved (one transaction).
 - **Fix:** the record text names the listing ("... (on lst-..., 'Clay and Chat')."), which also makes the audit trail clearer; and if a stored record is returned instead, the evidence is repointed at it. The test reproduces the crash without the fix.
 - **Lesson:** a rule written for scraped pages (dedupe identical payloads) silently applied to people's edits. Reusing a mechanism means re-checking its assumptions.
+
+## M9a · Brand v1: "Isar & Ochre"
+
+- **Chose:** the wordmark `morehere.` in Outfit Bold with an ochre full stop; Isar teal (`#17766F`) for anything you tap, Theatiner ochre (`#E0A33A`) for good moments, petrol ink on linen; a dark mode ("the Isar at night"); the story device is a line of postcards (each place you go back to becomes one). The app icon is `m.` on teal. Rules and voice: `docs/brand.md`; values: `app/src/theme/tokens.ts`.
+- **Rejected:**
+  - A · Neighbourhood, B · Chapters (bold chapters): less warm, or too loud.
+  - C1–C4 (Nunito/Fredoka/Baloo, sky blue, tomato, sage, plum): C3's layout and Outfit were kept.
+  - C6 Terracotta & Forest: cosy, but sits next to the red family (Meetup, Airbnb).
+  - C7 Oxblood & Lime: memorable, but less welcoming.
+- **Why these colours:** the apps people use to meet others or go out own red/coral (Meetup, Airbnb), orange (Eventbrite), yellow (Bumble, including Bumble For Friends, a direct competitor), bright blue and black. Teal with ochre is free and comes from Munich itself.
+- **Where the AI got it wrong:** the first concepts used sunflower yellow as the accent, which is Bumble's colour; caught only when the user asked for a brand nobody else uses. The first teal (`#1E8C86`) gave white button text 4.1:1, below the 4.5:1 minimum; darkened to `#17766F` (5.4:1).
+- **Guard:** `tests/test_brand_tokens.py` parses the tokens file and checks every text/background pair the app uses for WCAG AA contrast in light and dark mode, and that both palettes have the same names. It parses TypeScript with a regex, so the file follows a fixed format (noted at its top); that's simpler than adding a JS test runner before the app exists.
+- **Not yet:** loading Outfit in the app needs `@expo-google-fonts/outfit` (asked for in M9b); the font names in `tokens.fontFamily` match that package.
