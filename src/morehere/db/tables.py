@@ -260,3 +260,22 @@ class ListingDraftRow(Base):
         ),
         Index("ix_listing_drafts_review_status", "review_status"),
     )
+
+
+class CuratorActionRow(Base):
+    """Audit log of curator decisions in the admin: who did what, to which listing, why."""
+
+    __tablename__ = "curator_actions"
+
+    action_id: Mapped[int] = mapped_column(BigInteger, Identity(), primary_key=True)
+    at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+    curator: Mapped[str] = mapped_column(Text, nullable=False)
+    action: Mapped[str] = mapped_column(Text, nullable=False)
+    listing_id: Mapped[str | None] = mapped_column(
+        ForeignKey("listings.listing_id", ondelete="SET NULL")
+    )
+    details: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False, server_default="{}")
+
+    __table_args__ = (Index("ix_curator_actions_listing_id", "listing_id"),)

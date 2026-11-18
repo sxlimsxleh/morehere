@@ -72,3 +72,15 @@ sources:
     attribution: Google Maps
     refresh_cron: null
     reliability: 0.8
+
+  # A curator's edits and checks in the admin (milestone 7). Each edit is stored as a raw
+  # record ("Selim, 15 Nov: start_time = 19:30, confirmed by phone"), so a corrected value
+  # still has a source. Most reliable: a person checked it.
+  - source_id: curator
+    kind: curator
+    name: Curator decisions in the admin
+    legal_status: first_party
+    licence: null
+    attribution: null
+    refresh_cron: null
+    reliability: 0.95
