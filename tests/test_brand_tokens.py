@@ -77,7 +77,9 @@ TEXT_TOKENS = sorted({fg for fg, _, minimum in PAIRS if minimum == TEXT})
 @pytest.mark.parametrize("name", TEXT_TOKENS)
 def test_dark_mode_text_is_light(name: str) -> None:
     lum = luminance(palette("dark")[name])
-    assert lum >= 0.3, f"dark: {name} is a dark colour (luminance {lum:.2f}); text must be light in dark mode"
+    assert lum >= 0.3, (
+        f"dark: {name} is a dark colour (luminance {lum:.2f}); text must be light in dark mode"
+    )
 
 
 @pytest.mark.parametrize("theme", ["light", "dark"])
