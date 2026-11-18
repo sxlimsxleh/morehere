@@ -81,13 +81,18 @@ src/morehere/
   freshness.py               # hide stale published listings, show re-verified ones
   curation.py                # curator actions (approve, verify, edit, place, merge, hide),
                              #   add_from_text, curation_report; Curator = DB layer + audit log
-  api/                       # FastAPI app
+  api/                       # read-only FastAPI app: only published listings, facts with quotes
+    schemas.py               # response shapes (separate from internal models; nothing leaks)
+    service.py               # load published catalogue, filter, rank (+ distance), shape
+    app.py                   # endpoints: /listings /listings/{id} /search /map /health
+    export_openapi.py        # app/openapi.json (+ --check)
   logging.py                 # JSON logs: run_context(), timed_step(); loggers named morehere.*
 admin/curate.py              # Streamlit curator admin (local only, no login): queue, listing
                              #   with evidence, add from text, report, activity log
 evals/run_evals.py           # field accuracy, flag precision/recall, recurrence accuracy, merge precision
 evals/recordings/            # recorded LLM responses so CI runs without an API key
-app/                         # Expo app (later)
+app/                         # Expo app (milestone 9); for now openapi.json + generated
+                             #   src/api/schema.ts (npm run gen:api, openapi-typescript)
 tests/                       # tests/fixtures: hand-built API responses (not real data)
 DECISIONS.md                 # decision, rejected alternative, where the AI got it wrong
 docs/                        # research notes, e.g. docs/ical-sources.md
@@ -154,7 +159,8 @@ make promote   # pending drafts -> listings (merge, tags, score); never publishe
 make freshness # hide stale published listings, show re-verified ones
 make admin     # streamlit curator admin on :8501 (CURATOR_NAME in .env)
 make curation-report  # how often curators corrected the extractor (held-out vs samples)
-make api       # uvicorn API
+make api       # read-only API on :8000 (docs at /docs)
+make openapi   # export app/openapi.json and regenerate app/src/api/schema.ts
 ```
 
 ## Working agreement

@@ -4,7 +4,7 @@
 
 A scout that helps people new to Munich become a regular somewhere: it finds the recurring groups, work-friendly cafés and community spaces where the same faces show up week after week, and nudges you to keep going back.
 
-**Status:** milestone 7 (curator admin) built: a local Streamlit admin to review the queue, see every fact next to its quote, correct and publish listings, and add new ones by pasting text. Next: hand-curating the first 60 real listings.
+**Status:** milestone 8 (API) built: a read-only API serves only published listings (feed with filters and distance, detail with every fact's quote, keyword search, GeoJSON map), and the app's TypeScript types are generated from its OpenAPI schema.
 
 ## Run it
 
@@ -19,6 +19,7 @@ make ical-probe URL=https://...  # check what a calendar feed offers
 make evals     # score extraction on the golden set (needs ANTHROPIC_API_KEY in .env)
 make extract-samples && make extract && make promote  # samples -> drafts -> listings
 make admin     # curator admin on http://localhost:8501
+make api       # read-only API on http://localhost:8000/docs
 make test      # all tests (database tests skip if Postgres isn't running)
 ```
 

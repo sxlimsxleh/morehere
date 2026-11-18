@@ -1,0 +1,12 @@
+{
+  "name": "morehere-app",
+  "private": true,
+  "version": "0.1.0",
+  "description": "morehere. mobile app (Expo, milestone 9). For now: the API types generated from openapi.json.",
+  "scripts": {
+    "gen:api": "openapi-typescript openapi.json -o src/api/schema.ts"
+  },
+  "devDependencies": {
+    "openapi-typescript": "7.13.0"
+  }
+}

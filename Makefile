@@ -1,4 +1,4 @@
-.PHONY: setup test test-db lint format db db-down db-reset migrate seed osm osm-districts osm-replay ical ical-probe extract-samples extract evals evals-recorded promote freshness admin curation-report
+.PHONY: setup test test-db lint format db db-down db-reset migrate seed osm osm-districts osm-replay ical ical-probe extract-samples extract evals evals-recorded promote freshness admin curation-report api openapi
 
 setup:
 	uv sync
@@ -91,3 +91,13 @@ admin:
 # How often did curators correct the extractor? (held-out = outside the golden samples)
 curation-report:
 	uv run python -m morehere.curation report
+
+# --- API (milestone 8) ------------------------------------------------------------
+# Read-only API on http://localhost:8000 (interactive docs at /docs).
+api:
+	uv run uvicorn morehere.api.app:app --reload --port 8000
+
+# Export app/openapi.json and regenerate the app's TypeScript types from it.
+openapi:
+	uv run python -m morehere.api.export_openapi
+	cd app && npm install --no-audit --no-fund && npm run gen:api

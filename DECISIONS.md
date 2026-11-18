@@ -218,3 +218,24 @@ On the same recorded responses, the scoring, grounding and label changes alone t
 - Local or Codespace only, no login; the curator's name comes from `CURATOR_NAME`. A hosted admin needs real authentication first.
 - **Not built (deferred):** "unmerge". Splitting a merged listing correctly means re-promoting its drafts while preventing them from merging again, plus deciding where curator edits go. Until a real case needs it: hide the merged listing with a reason and re-add the sources.
 - The UI is a thin layer over `curation.Curator`; `AppTest` runs it headless in the tests (queue renders, a listing is opened and published through the real button).
+
+## M8 · The API returns its own shapes, never the internal models
+
+- **Chose:** `api/schemas.py` (`ListingCard`, `ListingDetail`, ...) separate from `morehere.models`. Review notes, raw record ids and drafts can't leak, and the app's contract stays stable when internals change. A test asserts the detail response has no `review_notes` or `field_evidence`.
+- Only published listings are served; an unpublished id answers 404 like an unknown one. Listings at places with coordinates outside every Munich district are left out (the OSM bounding box reaches beyond the city); places without coordinates are shown but not on the map.
+- Every fact in a detail response carries its quote and source; tags carry their quote; OSM places carry "© OpenStreetMap contributors".
+
+## M8 · Filtering in Python, not SQL (for now)
+
+- **Chose:** load the published catalogue and filter/rank in Python. With tens to hundreds of curated listings this is simple and fully testable (including "tonight" across a winter break).
+- **Changed from the plan:** I proposed keyword search "on Postgres"; it's a case-insensitive word match over title, category, place, tips and tags in Python instead, for the same reason. Move both to SQL when the catalogue reaches thousands; the functions' inputs and outputs stay the same. Semantic search (embeddings) is still a separate decision.
+
+## M8 · Dependencies at least two weeks old
+
+- `uv add fastapi` picked 0.164.0, uploaded that morning; 0.163.2 and 0.162.7 were 1 and 5 days old. Pinned `fastapi<0.162` (0.161.1, 22 Oct 2026): brand-new releases haven't had time for problems to surface. `openapi-typescript` is pinned to 7.13.0 (Feb 2026) with a committed lock file.
+
+## M8 · OpenAPI -> TypeScript, with a drift test
+
+- `make openapi` writes `app/openapi.json` and regenerates `app/src/api/schema.ts`; a test fails if the committed `openapi.json` doesn't match the code, so the app's types can't silently drift from the API.
+- **Where the AI got it wrong:** `from __future__ import annotations` in `api/app.py` turned FastAPI's dependency annotations into strings it couldn't resolve; that module keeps runtime annotations (comment in the file).
+- The test suite got slower (about 7 s -> 20-30 s) because the API tests rebuild their data per test. Acceptable for now; module-scoped data is the fix if it grows.
