@@ -80,7 +80,7 @@ def test_edit_keeps_rule_2_the_curator_is_the_source() -> None:
     )
     assert changed.title == "Isar Morning Runners"
     assert record is not None and record.source_id == CURATOR_SOURCE
-    assert record.payload.startswith("Selim, 2026-11-15: title = 'Isar Morning Runners'.")
+    assert record.payload.startswith("Selim, 2026-11-15: title = 'Isar Morning Runners' (on ")
     ev = changed.field_evidence["title"]
     assert ev.source_id == CURATOR_SOURCE and contains_span(record.payload, ev.source_text)
     assert CURATOR_SOURCE in changed.source_ids
@@ -230,6 +230,26 @@ def test_curator_actions_are_saved_and_logged(curated_db: Engine) -> None:
         record = repo.get_raw_record(s, saved.field_evidence["title"].raw_record_id)
         assert record is not None and "Website spelling." in record.payload
         assert [a["action"] for a in repo.list_actions(s, lid)] == ["approve", "edit_field"]
+
+
+@pytest.mark.db
+def test_same_edit_on_two_listings_the_same_day(curated_db: Engine) -> None:
+    # Found in real use: beginner_friendly = True on a second listing failed, because the
+    # identical record text was stored only once and the evidence pointed at a missing id.
+    from morehere.db import repo
+    from morehere.db.session import session_scope
+
+    curator = _curator(curated_db)
+    first, second = LISTINGS["tandem-tuesday-luma"], LISTINGS["clay-and-chat"]
+    curator.edit_field(first.listing_id, "group_size", "small")
+    curator.edit_field(second.listing_id, "group_size", "small")
+    curator.edit_field(second.listing_id, "group_size", "small")  # and the same edit twice
+    with session_scope(curated_db) as s:
+        for listing in (first, second):
+            saved = repo.get_listing(s, listing.listing_id)
+            assert saved is not None and saved.group_size == "small"
+            record = repo.get_raw_record(s, saved.field_evidence["group_size"].raw_record_id)
+            assert record is not None and listing.listing_id in record.payload
 
 
 @pytest.mark.db

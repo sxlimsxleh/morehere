@@ -60,9 +60,16 @@ class CurationError(ValueError):
 # ---------------------------------------------------------------------------
 
 
-def curator_record(curator: str, now: datetime, statement: str, note: str = "") -> RawRecord:
-    """A curator's statement as a raw record, so it can be quoted as evidence."""
-    payload = f"{curator}, {now.date().isoformat()}: {statement}."
+def curator_record(
+    curator: str, now: datetime, statement: str, note: str = "", listing: Listing | None = None
+) -> RawRecord:
+    """A curator's statement as a raw record, so it can be quoted as evidence.
+
+    The text names the listing: "beginner_friendly = True" on two listings on the same day
+    must be two records (identical text from one source is stored only once).
+    """
+    about = f" (on {listing.listing_id}, {listing.title!r})" if listing else ""
+    payload = f"{curator}, {now.date().isoformat()}: {statement}{about}."
     if note.strip():
         payload += f" {note.strip()}"
     digest = sha256_text(payload + now.isoformat())
@@ -83,6 +90,14 @@ def _evidence(record: RawRecord, quote: str) -> Evidence:
         source_text=quote,
         captured_at=record.fetched_at,
     )
+
+
+def _repoint_evidence(listing: Listing, old_id: str, new_id: str) -> Listing:
+    evidence = {
+        field: ev.model_copy(update={"raw_record_id": new_id}) if ev.raw_record_id == old_id else ev
+        for field, ev in listing.field_evidence.items()
+    }
+    return listing.model_copy(update={"field_evidence": evidence})
 
 
 def _with_curator_source(listing: Listing) -> list[str]:
@@ -113,7 +128,7 @@ def edit_field(
             raise CurationError(f"{field} can't be empty") from exc
         return changed, None
     statement = f"{field} = {value!r}"
-    record = curator_record(curator, now, statement, note)
+    record = curator_record(curator, now, statement, note, listing)
     evidence[field] = _evidence(record, statement)
     try:
         changed = Listing.model_validate(
@@ -152,7 +167,7 @@ def edit_schedule(
     )
     times = f"{start:%H:%M}" + (f"-{end:%H:%M}" if end else "")
     statement = f"schedule = {phrase!r} at {times}" + (f", {seasonal!r}" if seasonal else "")
-    record = curator_record(curator, now, statement, note)
+    record = curator_record(curator, now, statement, note, listing)
     evidence = {**listing.field_evidence, "schedule": _evidence(record, statement)}
     notes = [n for n in listing.review_notes if not n.startswith("no schedule yet")]
     changed = listing.model_copy(
@@ -242,7 +257,10 @@ class Curator:
                 raise CurationError(f"no listing {listing_id}")
             changed, record = change(listing, now)
             if record is not None:
-                repo.save_raw_record(session, record)
+                stored, _ = repo.save_raw_record(session, record)
+                if stored.raw_record_id != record.raw_record_id:
+                    # The same text was stored before: point the evidence at that record.
+                    changed = _repoint_evidence(changed, record.raw_record_id, stored.raw_record_id)
             changed = finish(changed, self.config.score_weights)
             repo.save_listing(session, changed)
             repo.log_action(session, self.name, action, listing_id, details)

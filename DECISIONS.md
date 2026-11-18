@@ -239,3 +239,9 @@ On the same recorded responses, the scoring, grounding and label changes alone t
 - `make openapi` writes `app/openapi.json` and regenerates `app/src/api/schema.ts`; a test fails if the committed `openapi.json` doesn't match the code, so the app's types can't silently drift from the API.
 - **Where the AI got it wrong:** `from __future__ import annotations` in `api/app.py` turned FastAPI's dependency annotations into strings it couldn't resolve; that module keeps runtime annotations (comment in the file).
 - The test suite got slower (about 7 s -> 20-30 s) because the API tests rebuild their data per test. Acceptable for now; module-scoped data is the fix if it grows.
+
+## M7 · Fix: identical curator edits on two listings
+
+- **Found in real use:** setting `beginner_friendly = True` on a second listing the same day crashed the admin with a foreign-key error. The record text ("Selim, 2026-11-18: beginner_friendly = True.") was identical, raw records are stored once per (source, sha256), so the second was skipped, and the listing's evidence pointed at an id that was never stored. Nothing was half-saved (one transaction).
+- **Fix:** the record text names the listing ("... (on lst-..., 'Clay and Chat')."), which also makes the audit trail clearer; and if a stored record is returned instead, the evidence is repointed at it. The test reproduces the crash without the fix.
+- **Lesson:** a rule written for scraped pages (dedupe identical payloads) silently applied to people's edits. Reusing a mechanism means re-checking its assumptions.
