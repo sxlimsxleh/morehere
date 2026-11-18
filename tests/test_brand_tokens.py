@@ -24,8 +24,8 @@ PAIRS: list[tuple[str, str, float]] = [
     ("onPrimary", "primary", TEXT),
     ("onPrimary", "primaryPressed", TEXT),
     ("onPrimaryTint", "primaryTint", TEXT),
-    ("primary", "surface", TEXT),  # text links
-    ("primary", "background", TEXT),
+    ("link", "surface", TEXT),
+    ("link", "background", TEXT),
     ("onAccent", "accent", TEXT),
     ("onAccent", "accentPressed", TEXT),
     ("onAccentTint", "accentTint", TEXT),
@@ -36,7 +36,7 @@ PAIRS: list[tuple[str, str, float]] = [
     ("onDisabled", "disabled", TEXT),
     ("focusRing", "background", UI),
     ("focusRing", "surface", UI),
-    ("primary", "background", UI),  # selected tab underline
+    ("link", "background", UI),  # selected tab underline
 ]
 
 
@@ -68,6 +68,16 @@ def test_contrast_formula() -> None:
 
 def test_light_and_dark_have_the_same_names() -> None:
     assert palette("light").keys() == palette("dark").keys()
+
+
+# Colours used for text. In dark mode all of them must be light (brand rule).
+TEXT_TOKENS = sorted({fg for fg, _, minimum in PAIRS if minimum == TEXT})
+
+
+@pytest.mark.parametrize("name", TEXT_TOKENS)
+def test_dark_mode_text_is_light(name: str) -> None:
+    lum = luminance(palette("dark")[name])
+    assert lum >= 0.3, f"dark: {name} is a dark colour (luminance {lum:.2f}); text must be light in dark mode"
 
 
 @pytest.mark.parametrize("theme", ["light", "dark"])

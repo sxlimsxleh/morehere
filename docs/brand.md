@@ -36,10 +36,14 @@ Teal with ochre is free. See DECISIONS.md, M9a.
 | Page | `background` | Linen. Most of every screen. |
 | Cards, sheets, nav | `surface` | White, with a `border` outline (1.5). No heavy shadows. |
 | Text | `ink`, `inkMuted` | `inkSubtle` is for decoration only, never text. |
-| **Tap me** | `primary` | Main buttons, selected tab, links, focus ring. Only things you can tap are teal. |
-| **Good moment** | `accent` | "I went!", a new postcard, a small highlight. Rare on purpose: about one per screen. Always dark text on it. |
+| **Tap me** | `primary` (fills), `link` (text and lines) | Main buttons and selected controls use `primary`; links and the selected tab underline use `link`. Only things you can tap are teal. |
+| **Good moment** | `accent` | "I went!", a new postcard, a small highlight. Rare on purpose: about one per screen. Text on it is `onAccent` (dark in light mode, light in dark mode). |
 | Tags | `primaryTint` / `accentTint` | Facts about a place ("come alone OK", "beginners welcome") use teal tint; money ("free", "€5") uses ochre tint. |
 | Status | `success`, `warning*`, `error` | Only for real status (a reminder is set, a form error). Ochre already reads as "warning", so warnings use its tint. |
+
+**Dark mode: all text is light.** No dark text on any fill, ever (a test checks this).
+Buttons keep a deep fill (teal `#17766F`, amber `#946512`) with light text; the bright
+teal (`link`) and ochre are used only for text, lines, dots and glows.
 
 Rough proportions on any screen: ~65% linen and white, ~25% ink, ~8% teal, ~2% ochre.
 
@@ -69,8 +73,8 @@ Headings are bold with tight spacing; body text is regular, never lighter than 4
 
 **Buttons**
 
-- Primary: teal with white text.
-- Accent ("I went!" only): ochre with ink text.
+- Primary: teal with white text (warm white in dark mode).
+- Accent ("I went!" only): ochre with ink text in light mode; deep amber with light text in dark mode.
 - Secondary: white with a `borderStrong` outline.
 - States:
   - Pressed: the `*Pressed` colour.

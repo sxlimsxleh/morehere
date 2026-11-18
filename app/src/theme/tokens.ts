@@ -6,6 +6,8 @@
 // Format rule (tests/test_brand_tokens.py parses this file): colours are
 // written as `name: "#RRGGBB",` one per line inside `light` and `dark`, and
 // both palettes have exactly the same names.
+//
+// Dark mode rule: every text colour is light. No dark text on any fill.
 
 /** Light palette: linen paper, petrol ink, Isar teal, Theatiner ochre. */
 export const light = {
@@ -22,8 +24,9 @@ export const light = {
   inkSubtle: "#8A9799", // decoration only (placeholder icons); never for text
 
   // Primary: anything you tap
-  primary: "#17766F", // Isar teal: main buttons, selected tab, links
+  primary: "#17766F", // Isar teal: fills of main buttons and selected controls
   primaryPressed: "#115A55",
+  link: "#17766F", // teal used as text or a line: links, selected tab underline
   onPrimary: "#FFFFFF",
   primaryTint: "#DDF1EE", // tag and chip backgrounds
   onPrimaryTint: "#0F5652",
@@ -64,16 +67,17 @@ export const dark = {
   inkMuted: "#A9BDBE",
   inkSubtle: "#6C8589",
 
-  primary: "#5CC2B8",
-  primaryPressed: "#48ADA3",
-  onPrimary: "#0E2328",
+  primary: "#17766F", // same deep teal fill as light mode, so its text stays light
+  primaryPressed: "#115A55",
+  link: "#5CC2B8", // the bright teal is for text and lines only
+  onPrimary: "#F3EFE6",
   primaryTint: "#1B4148",
   onPrimaryTint: "#A8E3DC",
   focusRing: "#8AD8CF",
 
-  accent: "#E9B65A",
-  accentPressed: "#D9A242",
-  onAccent: "#12343B",
+  accent: "#946512", // deep amber fill, so "I went!" keeps light text
+  accentPressed: "#7E5510",
+  onAccent: "#FFF6E5",
   accentTint: "#3B3322",
   onAccentTint: "#F2D49A",
   wordmarkDot: "#E9B65A",
